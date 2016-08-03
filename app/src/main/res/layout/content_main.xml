@@ -13,5 +13,19 @@
     tools:context="com.danielcswain.nearbychat.MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <TextView
+        android:id="@+id/channel_list_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textSize="@dimen/text_message_user_avatar"
+        />
 
+    <ListView
+        android:id="@+id/channel_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/channel_list_title"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        />
 </RelativeLayout>

@@ -30,6 +30,7 @@
         android:layout_below="@+id/user_avatar"
         android:padding="@dimen/message_bubble_padding"
         android:layout_marginRight="@dimen/message_body_alignment_margin"
+        android:layout_marginBottom="@dimen/message_bubble_margin"
         android:textColor="@color/textLight"
         android:background="@drawable/bg_message_item_received"
         />

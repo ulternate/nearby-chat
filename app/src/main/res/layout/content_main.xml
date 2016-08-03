@@ -13,12 +13,11 @@
     tools:context="com.danielcswain.nearbychat.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/messages_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="@null"
-        android:dividerHeight="2dp"
+        android:scrollbars="none"
         android:layout_above="@+id/text_entry_container"
         />
 

@@ -4,25 +4,26 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
-    ListView mMessagesListView;
     ArrayList<Message> mMessages;
-    ArrayAdapter<Message> mMessageArrayAdapter;
     EditText mTextField;
+    RecyclerView.Adapter mMessageRecyclerAdapter;
+    RecyclerView mMessagesRecyclerView;
+    RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +39,18 @@ public class MainActivity extends AppCompatActivity {
         mMessages.add(new Message("ulternate", "This is another message from me", true));
         mMessages.add(new Message("ulternate", "This is a really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really long message", true));
 
-        // Get the ArrayAdapter
-        mMessageArrayAdapter = new MessageListAdapter(this, mMessages);
+        // Get a reference to the RecyclerView and set the recycler view to have fixed layout size
+        // (as the layout is already full screen)
+        mMessagesRecyclerView = (RecyclerView) findViewById(R.id.messages_list);
+        mMessagesRecyclerView.setHasFixedSize(true);
 
-        // Get the list view
-        mMessagesListView = (ListView) findViewById(R.id.messages_list);
-        mMessagesListView.setAdapter(mMessageArrayAdapter);
+        // Using a stock linear layout manager for the RecyclerView
+        mLayoutManager = new LinearLayoutManager(this);
+        mMessagesRecyclerView.setLayoutManager(mLayoutManager);
+
+        // Set up the RecyclerView Adapter with the temporary data set and assign it to the RecyclerView
+        mMessageRecyclerAdapter = new MessageAdapter(mMessages);
+        mMessagesRecyclerView.setAdapter(mMessageRecyclerAdapter);
 
         // Get the message send views
         mTextField = (EditText) findViewById(R.id.text_entry_field);
@@ -63,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         mMessages.add(new Message("kenneth", message, bool));
                     }
-                    mMessageArrayAdapter.notifyDataSetChanged();
+                    mMessageRecyclerAdapter.notifyDataSetChanged();
                     hideSoftKeyboard(MainActivity.this, view);
                     mTextField.setText("");
                     mTextField.clearFocus();

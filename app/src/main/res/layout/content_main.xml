@@ -13,35 +13,5 @@
     tools:context="com.danielcswain.nearbychat.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/messages_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="none"
-        android:layout_above="@+id/text_entry_container"
-        />
-
-    <LinearLayout
-        android:id="@+id/text_entry_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/text_entry_field"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_weight="1"/>
-
-        <ImageButton
-            android:id="@+id/message_send_button"
-            android:layout_width="@dimen/message_send_button"
-            android:layout_height="@dimen/message_send_button"
-            android:src="@android:drawable/ic_menu_send"
-            android:background="@color/colorAccent"
-            android:layout_gravity="center_vertical"/>
-    </LinearLayout>
 
 </RelativeLayout>

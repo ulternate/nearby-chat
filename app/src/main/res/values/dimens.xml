@@ -7,4 +7,5 @@
     <dimen name="message_bubble_margin">4dp</dimen>
     <dimen name="message_body_alignment_margin">110dp</dimen>
     <dimen name="message_send_button">32dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

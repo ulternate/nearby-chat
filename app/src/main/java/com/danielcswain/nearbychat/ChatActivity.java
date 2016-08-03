@@ -2,14 +2,16 @@ package com.danielcswain.nearbychat;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.danielcswain.nearbychat.Messages.MessageAdapter;
 import com.danielcswain.nearbychat.Messages.MessageObject;
@@ -29,6 +31,14 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        // Get the calling intent
+        Intent intent = getIntent();
+
+        // Get reference to the topic text view and set the activity title using the calling intent
+        setTitle(intent.getStringExtra("channelTitle"));
+        TextView channelTopic = (TextView) findViewById(R.id.chat_channel_topic);
+        channelTopic.setText(intent.getStringExtra("channelTopic"));
 
         // Get the messages
         mMessageObjects = new ArrayList<>();
@@ -54,6 +64,8 @@ public class ChatActivity extends AppCompatActivity {
         mTextField = (EditText) findViewById(R.id.text_entry_field);
         ImageButton submitButton = (ImageButton) findViewById(R.id.message_send_button);
 
+        // Send a new message to the chat when the submit button is clicked
+        // TODO use Nearby API to actually send a message
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

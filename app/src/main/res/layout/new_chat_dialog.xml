@@ -33,7 +33,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
-        android:minLines="2"
         android:gravity="top|left"
         android:maxLines="4"
         android:layout_below="@+id/dialog_channel_name"

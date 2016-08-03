@@ -10,10 +10,20 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.danielcswain.nearbychat.ChatActivity">
 
+    <TextView
+        android:id="@+id/chat_channel_topic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_message_user_avatar"
+        android:textAlignment="center"
+        />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/messages_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/chat_channel_topic"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:scrollbars="none"
         android:layout_above="@+id/text_entry_container"
         />

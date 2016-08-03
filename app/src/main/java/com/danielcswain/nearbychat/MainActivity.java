@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
                 //TODO make this point to the correct Channel using the nearby API
                 Intent intent = new Intent(MainActivity.this, ChatActivity.class);
                 intent.putExtra("channelTitle", channelObjects.get(i).getChannelTitle());
+                intent.putExtra("channelTopic", channelObjects.get(i).getChannelTopic());
                 startActivity(intent);
             }
         });

@@ -9,4 +9,7 @@
     <string name="cancel">Cancel</string>
     <string name="dialog_channel_title">Create New Nearby Chat Channel</string>
     <string name="dialog_channel_empty_fields_error">Please enter values for the chat channel name and topic and try again</string>
+    <string name="channel_list_title_no_channels">No Nearby Chat Channels Nearby, Create One Below</string>
+    <string name="channel_list_title">The Following Chat Channels Are Nearby</string>
+    <string name="dialog_channel_empty_password_error">To make a private channel you must enter the password and share it with those you wish to have access</string>
 </resources>

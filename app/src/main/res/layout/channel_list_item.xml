@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@drawable/bg_message_item_received">
+    android:background="@drawable/bg_message_item_sent">
 
     <TextView
         android:id="@+id/channel_title"
@@ -16,7 +16,7 @@
         android:textSize="@dimen/text_message_user_avatar"
         android:textStyle="bold"
         android:text="test"
-        android:textColor="@color/textLight"
+        android:textColor="@color/textDark"
         />
 
     <TextView
@@ -24,16 +24,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="This is a channel topic"
-        android:textColor="@color/textLight"
+        android:textColor="@color/textDark"
         android:layout_below="@+id/channel_title"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         />
 
     <ImageView
-        android:id="@+id/channel_private"
+        android:id="@+id/channel_private_image"
         android:layout_width="@dimen/message_send_button"
         android:layout_height="@dimen/message_send_button"
-        android:src="@drawable/ic_lock"
+        android:src="@drawable/ic_lock_dark"
         android:layout_alignParentRight="true"
         />
 

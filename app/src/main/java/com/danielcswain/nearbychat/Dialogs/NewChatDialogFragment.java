@@ -13,6 +13,8 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.danielcswain.nearbychat.Channels.ChannelObject;
+import com.danielcswain.nearbychat.MainActivity;
 import com.danielcswain.nearbychat.R;
 
 /**
@@ -96,10 +98,21 @@ public class NewChatDialogFragment extends DialogFragment {
                 public void onClick(View view) {
                     String channelName = mChannelNameET.getText().toString();
                     String channelTopic = mChannelTopicET.getText().toString();
+                    String channelPassword = mChannelPasswordET.getText().toString();
 
                     if (!channelName.isEmpty() && !channelTopic.isEmpty()){
-                        Toast.makeText(getActivity(), "Channel " + channelName + " created, with the following topic: " + channelTopic, Toast.LENGTH_SHORT).show();
-                        //TODO create channel and check password
+                        if (mPrivateSwitch.isChecked()){
+                            if (!channelPassword.isEmpty()) {
+                                // Add a private channel to the Channel list
+                                MainActivity.mChannelListAdapter.add(new ChannelObject(channelName, channelTopic, true));
+                            } else {
+                                Toast.makeText(getActivity(), R.string.dialog_channel_empty_password_error, Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            // Add a public channel to the Channel list
+                            MainActivity.mChannelListAdapter.add(new ChannelObject(channelName, channelTopic, false));
+                        }
+
                         NewChatDialogFragment.this.getDialog().dismiss();
                     } else {
                         Toast.makeText(getActivity(), R.string.dialog_channel_empty_fields_error, Toast.LENGTH_SHORT).show();

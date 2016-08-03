@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_channel_title"
+        android:layout_marginTop="@dimen/activity_vertical_margin_double"
+        android:textSize="@dimen/text_message_user_avatar"
+        android:textStyle="bold"
+        android:gravity="center"
+        />
+
+    <EditText
+        android:id="@+id/dialog_channel_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textCapWords"
+        android:layout_below="@+id/dialog_title"
+        android:layout_marginTop="@dimen/activity_vertical_margin_double"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_half"
+        android:hint="@string/dialog_channel_name_hint"
+        />
+
+    <EditText
+        android:id="@+id/dialog_channel_topic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textCapWords"
+        android:layout_below="@+id/dialog_channel_name"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_half"
+        android:hint="@string/dialog_channel_topic_hint"
+        />
+
+    <TextView
+        android:id="@+id/dialog_private_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dialog_channel_topic"
+        android:layout_marginTop="@dimen/activity_vertical_margin_half"
+        android:layout_toLeftOf="@+id/dialog_private_switch"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_alignTop="@+id/dialog_private_switch"
+        android:layout_alignBottom="@+id/dialog_private_switch"
+        android:gravity="center_vertical"
+        android:text="@string/dialog_channel_private_label"
+        />
+
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/dialog_private_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dialog_channel_topic"
+        android:layout_marginTop="@dimen/activity_vertical_margin_half"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:checked="false"
+        />
+
+    <EditText
+        android:id="@+id/dialog_channel_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:fontFamily="sans-serif"
+        android:layout_below="@+id/dialog_private_switch"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_half"
+        android:hint="@string/dialog_channel_password_hint"
+        android:visibility="gone"
+        />
+
+</RelativeLayout>

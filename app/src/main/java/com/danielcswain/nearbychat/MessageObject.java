@@ -2,14 +2,16 @@ package com.danielcswain.nearbychat;
 
 /**
  * Created by ulternate on 3/08/2016.
+ *
+ * Custom Object representing a single message object
  */
-public class Message {
+public class MessageObject {
 
     private String username;
     private String messageBody;
     private Boolean fromUser;
 
-    public Message(String username, String messageBody, Boolean fromUser){
+    public MessageObject(String username, String messageBody, Boolean fromUser){
         this.username = username;
         this.messageBody = messageBody;
         this.fromUser = fromUser;

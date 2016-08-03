@@ -16,7 +16,7 @@ import java.util.Random;
 
 public class ChatActivity extends AppCompatActivity {
 
-    ArrayList<Message> mMessages;
+    ArrayList<MessageObject> mMessageObjects;
     EditText mTextField;
     RecyclerView.Adapter mMessageRecyclerAdapter;
     RecyclerView mMessagesRecyclerView;
@@ -28,11 +28,11 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         // Get the messages
-        mMessages = new ArrayList<>();
-        mMessages.add(new Message("ulternate", "This is a message from me", true));
-        mMessages.add(new Message("kenneth", "This is a message from someone else", false));
-        mMessages.add(new Message("ulternate", "This is another message from me", true));
-        mMessages.add(new Message("ulternate", "This is a really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really long message", true));
+        mMessageObjects = new ArrayList<>();
+        mMessageObjects.add(new MessageObject("ulternate", "This is a message from me", true));
+        mMessageObjects.add(new MessageObject("kenneth", "This is a message from someone else", false));
+        mMessageObjects.add(new MessageObject("ulternate", "This is another message from me", true));
+        mMessageObjects.add(new MessageObject("ulternate", "This is a really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really, really long message", true));
 
         // Get a reference to the RecyclerView and set the recycler view to have fixed layout size
         // (as the layout is already full screen)
@@ -44,7 +44,7 @@ public class ChatActivity extends AppCompatActivity {
         mMessagesRecyclerView.setLayoutManager(mLayoutManager);
 
         // Set up the RecyclerView Adapter with the temporary data set and assign it to the RecyclerView
-        mMessageRecyclerAdapter = new MessageAdapter(mMessages);
+        mMessageRecyclerAdapter = new MessageAdapter(mMessageObjects);
         mMessagesRecyclerView.setAdapter(mMessageRecyclerAdapter);
 
         // Get the message send views
@@ -61,9 +61,9 @@ public class ChatActivity extends AppCompatActivity {
                     Random rand = new Random();
                     Boolean bool = rand.nextBoolean();
                     if (bool){
-                        mMessages.add(new Message("ulternate", message, bool));
+                        mMessageObjects.add(new MessageObject("ulternate", message, bool));
                     } else {
-                        mMessages.add(new Message("kenneth", message, bool));
+                        mMessageObjects.add(new MessageObject("kenneth", message, bool));
                     }
                     mMessageRecyclerAdapter.notifyDataSetChanged();
                     hideSoftKeyboard(ChatActivity.this, view);

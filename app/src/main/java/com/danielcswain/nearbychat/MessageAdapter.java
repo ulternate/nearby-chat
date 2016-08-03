@@ -13,31 +13,31 @@ import java.util.Objects;
  *
  * Custom Adapter extending the RecyclerView.Adapter class. This represents a single chat window and uses
  * the MessageViewHolder class to hold the individual message views which get their contents from the
- * mMessages ArrayList
+ * mMessageObjects ArrayList
  */
 public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder> {
 
-    private ArrayList<Message> mMessages;
+    private ArrayList<MessageObject> mMessageObjects;
 
     /**
      * Constructor for the MessageAdapter
-     * @param messages an ArrayList of Message objects
+     * @param messageObjects an ArrayList of MessageObject objects
      */
-    public MessageAdapter(ArrayList<Message> messages){
-        this.mMessages = messages;
+    public MessageAdapter(ArrayList<MessageObject> messageObjects){
+        this.mMessageObjects = messageObjects;
     }
 
     /**
      * Get the ViewType of the item. This is used to determine whether to inflate the message_item_received or
      * message_item_sent layouts in onCreateViewHolder.
      *
-     * @param position the position of the ItemView object in the mMessages arrayList / RecyclerView.Adapter
+     * @param position the position of the ItemView object in the mMessageObjects arrayList / RecyclerView.Adapter
      * @return 0 for a message that was sent the user and 1 if it was a received message.
      */
     @Override
     public int getItemViewType(int position) {
-        Message message = mMessages.get(position);
-        if (message.getFromUser()){
+        MessageObject messageObject = mMessageObjects.get(position);
+        if (messageObject.getFromUser()){
             return 0;
         } else {
             return 1;
@@ -75,18 +75,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder> {
      */
     @Override
     public void onBindViewHolder(MessageViewHolder holder, int position) {
-        // Get the message from the ArrayList at the position specified
-        Message message = mMessages.get(position);
+        // Get the messageObject from the ArrayList at the position specified
+        MessageObject messageObject = mMessageObjects.get(position);
 
-        // Set the TextViews from the ViewHolder with the appropriate data from the message.
-        holder.usernameTV.setText(message.getUsername());
-        holder.messageBodyTV.setText(message.getMessageBody());
+        // Set the TextViews from the ViewHolder with the appropriate data from the messageObject.
+        holder.usernameTV.setText(messageObject.getUsername());
+        holder.messageBodyTV.setText(messageObject.getMessageBody());
 
-        // If not the first message then check if the previous message was from the same user.
+        // If not the first messageObject then check if the previous messageObject was from the same user.
         // if so, then don't display the user's avatar or username
         if (position > 0){
-            String prevUsername = mMessages.get(position - 1).getUsername();
-            if (Objects.equals(prevUsername, message.getUsername())){
+            String prevUsername = mMessageObjects.get(position - 1).getUsername();
+            if (Objects.equals(prevUsername, messageObject.getUsername())){
                 holder.userAvatarIV.setVisibility(View.GONE);
                 holder.usernameTV.setVisibility(View.GONE);
             }
@@ -98,6 +98,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder> {
      */
     @Override
     public int getItemCount() {
-        return mMessages.size();
+        return mMessageObjects.size();
     }
 }

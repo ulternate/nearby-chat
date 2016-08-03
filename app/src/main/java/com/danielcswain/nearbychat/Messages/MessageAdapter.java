@@ -1,9 +1,11 @@
-package com.danielcswain.nearbychat;
+package com.danielcswain.nearbychat.Messages;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.danielcswain.nearbychat.R;
 
 import java.util.ArrayList;
 import java.util.Objects;

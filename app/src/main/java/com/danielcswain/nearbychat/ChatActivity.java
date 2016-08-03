@@ -11,6 +11,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.danielcswain.nearbychat.Messages.MessageAdapter;
+import com.danielcswain.nearbychat.Messages.MessageObject;
+
 import java.util.ArrayList;
 import java.util.Random;
 

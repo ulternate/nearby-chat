@@ -1,9 +1,11 @@
-package com.danielcswain.nearbychat;
+package com.danielcswain.nearbychat.Messages;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.danielcswain.nearbychat.R;
 
 /**
  * Created by ulternate on 3/08/2016.

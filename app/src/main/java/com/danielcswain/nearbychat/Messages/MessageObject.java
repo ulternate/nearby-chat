@@ -1,4 +1,4 @@
-package com.danielcswain.nearbychat;
+package com.danielcswain.nearbychat.Messages;
 
 /**
  * Created by ulternate on 3/08/2016.

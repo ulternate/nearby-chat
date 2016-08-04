@@ -30,6 +30,6 @@
         android:layout_below="@+id/channel_list_title"
         android:layout_marginTop="@dimen/activity_vertical_margin_double"
         android:divider="@null"
-        android:dividerHeight="2dp"
+        android:dividerHeight="@dimen/activity_vertical_margin_half"
         />
 </RelativeLayout>

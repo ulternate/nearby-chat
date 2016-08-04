@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:textSize="@dimen/text_message_user_avatar"
+        android:textSize="@dimen/text_title"
         android:textStyle="bold"
         />
 

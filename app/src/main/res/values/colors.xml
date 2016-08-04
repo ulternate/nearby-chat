@@ -5,6 +5,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="messageReceived">#0d47a1</color>
     <color name="messageSent">#cfd8dc</color>
+    <color name="channelCard">#EEEEEE</color>
     <color name="textLight">#c5cae9</color>
     <color name="textDark">#212121</color>
 </resources>

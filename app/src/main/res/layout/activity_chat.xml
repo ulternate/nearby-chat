@@ -14,7 +14,7 @@
         android:id="@+id/chat_channel_topic"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/text_message_user_avatar"
+        android:textSize="@dimen/text_title"
         android:textAlignment="center"
         />
 

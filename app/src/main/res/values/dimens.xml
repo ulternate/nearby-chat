@@ -13,5 +13,6 @@
     <dimen name="message_body_alignment_margin">110dp</dimen>
     <dimen name="message_send_button">32dp</dimen>
     <dimen name="channel_topic_min_height">32dp</dimen>
+    <dimen name="channel_dialog_title_height">48dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 </resources>

@@ -1,29 +1,40 @@
 package com.danielcswain.nearbychat;
 
 import android.content.Intent;
+import android.content.IntentSender;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.danielcswain.nearbychat.Channels.ChannelListAdapter;
 import com.danielcswain.nearbychat.Channels.ChannelObject;
 import com.danielcswain.nearbychat.Dialogs.NewChatDialogFragment;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.nearby.Nearby;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private String NEW_CHAT_DIALOG_TAG = "New Chat Dialog";
+    private static final int REQUEST_RESOLVE_ERROR = 1001;
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     public static ChannelListAdapter mChannelListAdapter;
     private ArrayList<ChannelObject> channelObjects;
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,10 +52,10 @@ public class MainActivity extends AppCompatActivity {
         mChannelListAdapter = new ChannelListAdapter(this, channelObjects);
 
         // Add a fake channel to the ArrayList
-        channelObjects.add(new ChannelObject("Group Chat", "A place for group discussion on the Group Project", true));
+//        channelObjects.add(new ChannelObject("Group Chat", "A place for group discussion on the Group Project", true));
 
         // Set the channel list title text and the connect the listAdapter to the ListView
-        channelListTitle.setText(R.string.channel_list_title);
+        channelListTitle.setText(R.string.channel_list_title_no_channels);
         channelListView.setAdapter(mChannelListAdapter);
 
         // Set the listView onListItemClickListener
@@ -68,6 +79,27 @@ public class MainActivity extends AppCompatActivity {
                 newChatDialogFragment.show(fm, NEW_CHAT_DIALOG_TAG);
             }
         });
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Nearby.MESSAGES_API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("onStart", "onStart called");
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onStop() {
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+        super.onStop();
     }
 
     @Override
@@ -90,5 +122,43 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        //TODO
+        Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
+//        subscribe();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        //TODO
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        if (connectionResult.hasResolution()) {
+            try {
+                connectionResult.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
+            } catch (IntentSender.SendIntentException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.e(TAG, "GoogleApiClient connection failed");
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_RESOLVE_ERROR) {
+            if (resultCode == RESULT_OK) {
+                mGoogleApiClient.connect();
+            } else {
+                Log.e(TAG, "GoogleApiClient connection failed. Unable to resolve.");
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }

@@ -1,5 +1,9 @@
 package com.danielcswain.nearbychat.Channels;
 
+import com.google.android.gms.nearby.messages.Message;
+
+import java.nio.charset.Charset;
+
 /**
  * Created by ulternate on 3/08/2016.
  *
@@ -21,6 +25,17 @@ public class ChannelObject {
         this.channelTitle = channelTitle;
         this.channelTopic = channelTopic;
         this.channelPrivate = channelPrivate;
+    }
+
+    public Message newNearbyMessage(String channelTitle, String channelTopic){
+        ChannelObject channelObject = new ChannelObject(channelTitle, channelTopic, false);
+        return new Message(channelObject.getChannelTitle().getBytes(Charset.forName("UTF-8")), channelTopic);
+    }
+
+    public static ChannelObject fromNearbyMessage(Message message){
+        String nearbyMessageString = new String(message.getContent()).trim();
+        String nearbyMessageType = message.getType().trim();
+        return new ChannelObject(nearbyMessageString, nearbyMessageType, false);
     }
 
     public String getChannelTitle() {

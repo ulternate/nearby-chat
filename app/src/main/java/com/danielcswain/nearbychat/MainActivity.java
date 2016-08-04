@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.danielcswain.nearbychat.Channels.ChannelListAdapter;
 import com.danielcswain.nearbychat.Channels.ChannelObject;
@@ -27,6 +26,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.messages.Message;
+import com.google.android.gms.nearby.messages.MessageListener;
 
 import java.util.ArrayList;
 
@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 //    private GoogleApiClient mGoogleApiClient;
     public static Message mPubMessage;
     private static View mContainer;
+    private MessageListener mMessageListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +95,20 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
+
+        mMessageListener = new MessageListener() {
+            @Override
+            public void onFound(final Message message) {
+                // Called when a new message is found.
+                mChannelListAdapter.add(ChannelObject.fromNearbyMessage(message));
+            }
+
+            @Override
+            public void onLost(final Message message) {
+                // Called when a message is no longer detectable nearby.
+                mChannelListAdapter.remove(ChannelObject.fromNearbyMessage(message));
+            }
+        };
     }
 
     @Override
@@ -105,6 +120,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onStop() {
+
+        unpublish();
+        unsubscribe();
+
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
@@ -136,8 +155,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         //TODO
-        Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
-//        subscribe();
+//        Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
+
+        subscribe();
     }
 
     @Override
@@ -179,10 +199,39 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         if (status.isSuccess()) {
                             Log.i(TAG, "Published successfully.");
                         } else {
-                            if (mContainer != null){
-                            Snackbar.make(mContainer, "Could not publish, status = " + status, Snackbar.LENGTH_SHORT).show();}
+                            logAndShowSnackbar("Could not publish, status = " + status);
                         }
                     }
                 });
+    }
+
+    private void subscribe(){
+        Nearby.Messages.subscribe(mGoogleApiClient, mMessageListener)
+                .setResultCallback(new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(@NonNull Status status) {
+                        if (status.isSuccess()) {
+                            Log.i(TAG, "Subscribed successfully.");
+                        } else {
+                            logAndShowSnackbar("Could not subscribe, status = " + status);
+                        }
+                    }
+                });
+    }
+
+    private void unpublish() {
+        Log.i(TAG, "Unpublishing.");
+        Nearby.Messages.unpublish(mGoogleApiClient, mPubMessage);
+    }
+
+    private void unsubscribe(){
+        Log.i(TAG, "Unsubscribing.");
+        Nearby.Messages.unsubscribe(mGoogleApiClient, mMessageListener);
+    }
+
+    private static void logAndShowSnackbar(String message){
+        if (mContainer != null){
+            Snackbar.make(mContainer, message, Snackbar.LENGTH_SHORT).show();
+        }
     }
 }

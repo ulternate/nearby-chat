@@ -16,7 +16,19 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
+        // Build string resource containing Nearby API Key
+        applicationVariants.all{ variant ->
+            variant.resValue "string", "NEARBY_API_KEY", "\"" + getAPIKey() + "\""
+        }
     }
+}
+
+//Get the Nearby API Key from the gradle.properties file (not checked in)
+def getAPIKey(){
+    def Properties properties = new Properties()
+    properties.load(new FileInputStream(new File('gradle.properties')))
+    return properties['NEARBY_API_KEY']
 }
 
 dependencies {
@@ -25,4 +37,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.1.1'
     compile 'com.android.support:design:24.1.1'
     compile 'com.android.support:recyclerview-v7:24.1.1'
+    compile 'com.google.android.gms:play-services-nearby:9.2.1'
 }

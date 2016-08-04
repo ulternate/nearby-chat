@@ -104,13 +104,17 @@ public class NewChatDialogFragment extends DialogFragment {
                         if (mPrivateSwitch.isChecked()){
                             if (!channelPassword.isEmpty()) {
                                 // Add a private channel to the Channel list
-                                MainActivity.mChannelListAdapter.add(new ChannelObject(channelName, channelTopic, true));
+                                // TODO make this work with NearbyAPI
+                                // MainActivity.mChannelListAdapter.add(new ChannelObject(channelName, channelTopic, true));
                             } else {
                                 Toast.makeText(getActivity(), R.string.dialog_channel_empty_password_error, Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             // Add a public channel to the Channel list
                             MainActivity.mChannelListAdapter.add(new ChannelObject(channelName, channelTopic, false));
+                            // Prepare the message that will be published by the device
+                            MainActivity.mPubMessage = ChannelObject.newNearbyMessage(channelName, channelTopic);
+                            MainActivity.publishMessage(MainActivity.mPubMessage);
                         }
 
                         NewChatDialogFragment.this.getDialog().dismiss();

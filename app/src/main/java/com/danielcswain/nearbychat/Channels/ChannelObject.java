@@ -27,7 +27,7 @@ public class ChannelObject {
         this.channelPrivate = channelPrivate;
     }
 
-    public Message newNearbyMessage(String channelTitle, String channelTopic){
+    public static Message newNearbyMessage(String channelTitle, String channelTopic){
         ChannelObject channelObject = new ChannelObject(channelTitle, channelTopic, false);
         return new Message(channelObject.getChannelTitle().getBytes(Charset.forName("UTF-8")), channelTopic);
     }

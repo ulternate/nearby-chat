@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -22,19 +23,25 @@ import com.danielcswain.nearbychat.Channels.ChannelObject;
 import com.danielcswain.nearbychat.Dialogs.NewChatDialogFragment;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.nearby.Nearby;
+import com.google.android.gms.nearby.messages.Message;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
+    private static GoogleApiClient mGoogleApiClient;
     private String NEW_CHAT_DIALOG_TAG = "New Chat Dialog";
     private static final int REQUEST_RESOLVE_ERROR = 1001;
     private static final String TAG = MainActivity.class.getSimpleName();
 
     public static ChannelListAdapter mChannelListAdapter;
     private ArrayList<ChannelObject> channelObjects;
-    private GoogleApiClient mGoogleApiClient;
+//    private GoogleApiClient mGoogleApiClient;
+    public static Message mPubMessage;
+    private static View mContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mContainer = findViewById(R.id.channel_list).getRootView();
 
         // Get the channel list view and layout title text view
         TextView channelListTitle = (TextView) findViewById(R.id.channel_list_title);
@@ -160,5 +169,20 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    public static void publishMessage(Message message){
+        Nearby.Messages.publish(mGoogleApiClient, message)
+                .setResultCallback(new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(@NonNull Status status) {
+                        if (status.isSuccess()) {
+                            Log.i(TAG, "Published successfully.");
+                        } else {
+                            if (mContainer != null){
+                            Snackbar.make(mContainer, "Could not publish, status = " + status, Snackbar.LENGTH_SHORT).show();}
+                        }
+                    }
+                });
     }
 }

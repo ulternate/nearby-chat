@@ -16,6 +16,7 @@ public class ChannelObject {
     private final String channelTitle;
     private final String channelTopic;
     private final Boolean channelPrivate;
+    private final Boolean channelIsUsers;
 
     /**
      * Constructor to create a chat channel object
@@ -23,14 +24,15 @@ public class ChannelObject {
      * @param channelTopic the chat channel's topic of discussion
      * @param channelPrivate whether the chat channel is private or not
      */
-    public ChannelObject(String channelTitle, String channelTopic, Boolean channelPrivate){
+    public ChannelObject(String channelTitle, String channelTopic, Boolean channelPrivate, Boolean channelIsUsers){
         this.channelTitle = channelTitle;
         this.channelTopic = channelTopic;
         this.channelPrivate = channelPrivate;
+        this.channelIsUsers = channelIsUsers;
     }
 
-    public static Message newNearbyMessage(String channelTitle, String channelTopic){
-        ChannelObject channelObject = new ChannelObject(channelTitle, channelTopic, false);
+    public static Message newNearbyMessage(String channelTitle, String channelTopic, Boolean channelIsUsers){
+        ChannelObject channelObject = new ChannelObject(channelTitle, channelTopic, false, channelIsUsers);
         return new Message(gson.toJson(channelObject).getBytes(Charset.forName("UTF-8")), "Channel");
     }
 
@@ -53,4 +55,7 @@ public class ChannelObject {
         return channelPrivate;
     }
 
+    public Boolean getChannelIsUsers() {
+        return channelIsUsers;
+    }
 }

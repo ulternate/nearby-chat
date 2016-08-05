@@ -113,8 +113,8 @@ public class NewChatDialogFragment extends DialogFragment {
                             }
                         } else {
                             // Try and publish a message with the Channel information (if successful a channel will be added
-                            // to the main activity list adapter.
-                            MainActivity.publishMessage(ChannelObject.newNearbyMessage(channelName, channelTopic));
+                            // to the main activity list adapter. Channel's created through dialog are the user's channel
+                            MainActivity.publishMessage(ChannelObject.newNearbyMessage(channelName, channelTopic, true));
                         }
                         NewChatDialogFragment.this.getDialog().dismiss();
                     } else {

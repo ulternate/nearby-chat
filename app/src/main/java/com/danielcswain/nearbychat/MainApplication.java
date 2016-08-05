@@ -7,8 +7,7 @@ import android.app.Application;
  */
 public class MainApplication extends Application {
 
-    public static boolean firstStart;
-;
+    public static boolean firstStart = true;
 
     public MainApplication(){
 
@@ -17,8 +16,6 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        firstStart = true;
     }
 
     public static void setFirstStart(boolean bool){

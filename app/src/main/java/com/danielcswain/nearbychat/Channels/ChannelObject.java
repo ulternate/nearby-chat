@@ -1,7 +1,5 @@
 package com.danielcswain.nearbychat.Channels;
 
-import android.util.Log;
-
 import com.google.android.gms.nearby.messages.Message;
 import com.google.gson.Gson;
 
@@ -53,14 +51,12 @@ public class ChannelObject {
     @Override
     public boolean equals(Object obj) {
         boolean match = false;
-        Log.d("matching", "matching objects");
         if (obj != null && obj instanceof ChannelObject){
             if (Objects.equals(((ChannelObject) obj).channelTitle, this.channelTitle) &&
                     Objects.equals(((ChannelObject) obj).channelTopic, this.channelTopic) &&
                     Objects.equals(((ChannelObject) obj).channelPrivate, this.channelPrivate) &&
                     Objects.equals(((ChannelObject) obj).channelIsUsers, this.channelIsUsers)){
                 match = true;
-                Log.d("matched", "it was a match");
             }
         }
         return match;

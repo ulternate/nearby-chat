@@ -13,6 +13,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.danielcswain.nearbychat.Channels.ChannelObject;
 import com.danielcswain.nearbychat.MainActivity;
 import com.danielcswain.nearbychat.R;
 
@@ -113,7 +114,7 @@ public class NewChatDialogFragment extends DialogFragment {
                         } else {
                             // Try and publish a message with the Channel information (if successful a channel will be added
                             // to the main activity list adapter.
-                            MainActivity.publishMessage(MainActivity.mPubMessage);
+                            MainActivity.publishMessage(ChannelObject.newNearbyMessage(channelName, channelTopic));
                         }
                         NewChatDialogFragment.this.getDialog().dismiss();
                     } else {

@@ -1,7 +1,9 @@
 package com.danielcswain.nearbychat;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,6 +31,8 @@ import com.google.android.gms.nearby.messages.Message;
 import com.google.android.gms.nearby.messages.MessageListener;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -36,16 +40,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private static final String NEW_CHAT_DIALOG_TAG = NewChatDialogFragment.class.getSimpleName();
     private static final int REQUEST_RESOLVE_ERROR = 1001;
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String NEARBY_PUBLISH_CHANNEL_SUCCESS = String.valueOf(R.string.nearby_publish_channel_success);
-    private static final String NEARBY_PUBLISH_CHANNEL_FAILED_STATUS = String.valueOf(R.string.nearby_publish_channel_failed_status);
-    private static final String NEARBY_SUBSCRIPTION_CHANNEL_SUCCESS = String.valueOf(R.string.nearby_subscription_success);
-    private static final String NEARBY_SUBSCRIPTION_CHANNEL_FAILED_STATUS = String.valueOf(R.string.nearby_subscription_failed_status);
+    private static final String SHARED_PREFS_FILE = "NearbyChatPreferences";
+    private static final String SHARED_PREFS_CHANNEL_TITLE_KEY = "title";
+    private static final String SHARED_PREFS_CHANNEL_TOPIC_KEY = "topic";
 
     public static ChannelListAdapter mChannelListAdapter;
     private ArrayList<ChannelObject> channelObjects;
     public static Message mPubMessage;
     private static View mContainer;
     private MessageListener mMessageListener;
+    private SharedPreferences mSharedPreferences;
+    private static Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +59,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Get the application context
+        mContext = getApplicationContext();
+
         // Get the root view for showing a snackbar
-        mContainer = findViewById(R.id.channel_list).getRootView();
+        mContainer = findViewById(R.id.channel_list);
 
         // Get the channel list view and layout title text view
         TextView channelListTitle = (TextView) findViewById(R.id.channel_list_title);
@@ -112,6 +120,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 mChannelListAdapter.remove(ChannelObject.fromNearbyMessage(message));
             }
         };
+
+        // Get the shared preferences for temporarily storing the chat channel information
+        mSharedPreferences = getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE);
     }
 
     /**
@@ -124,12 +135,27 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     /**
-     * When the activity is no longer in view and onStop is called, unpublish and unsubscribe and
+     * Get any previously published channel messages from the shared preferences and re publish them.
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Set<String> channelTitles = mSharedPreferences.getStringSet(SHARED_PREFS_CHANNEL_TITLE_KEY, new HashSet<String>());
+        Set<String> channelTopics = mSharedPreferences.getStringSet(SHARED_PREFS_CHANNEL_TOPIC_KEY, new HashSet<String>());
+
+        Log.d("titles", channelTitles.toString());
+        Log.d("topics", channelTopics.toString());
+    }
+
+    /**
+     * When the activity is no longer in view and onStop is called, unpublishMessage and unsubscribe and
      * disconnect from the GoogleApiClient if it is connected.
      */
     @Override
     public void onStop() {
-        unpublish();
+//        unpublishMessage(mPubMessage);
+        // Store the published
+        storeChannelsInSharedPreferences(channelObjects);
         unsubscribe();
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
@@ -212,10 +238,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     public void onResult(@NonNull Status status) {
                         if (status.isSuccess()) {
                             // Add the chat channel to the channel list
+                            mPubMessage = message;
                             mChannelListAdapter.add(ChannelObject.fromNearbyMessage(message));
-                            showSnackbar(NEARBY_PUBLISH_CHANNEL_SUCCESS);
+                            showSnackbar(mContext.getString(R.string.nearby_publish_channel_success));
                         } else {
-                            showSnackbar(NEARBY_PUBLISH_CHANNEL_FAILED_STATUS + status);
+                            showSnackbar(mContext.getString(R.string.nearby_publish_channel_failed_status) + status);
                         }
                     }
                 });
@@ -231,9 +258,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     @Override
                     public void onResult(@NonNull Status status) {
                         if (status.isSuccess()) {
-                            showSnackbar(NEARBY_SUBSCRIPTION_CHANNEL_SUCCESS);
+                            showSnackbar(mContext.getString(R.string.nearby_subscription_success));
                         } else {
-                            showSnackbar(NEARBY_SUBSCRIPTION_CHANNEL_FAILED_STATUS + status);
+                            showSnackbar(mContext.getString(R.string.nearby_subscription_failed_status) + status);
                         }
                     }
                 });
@@ -242,10 +269,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     /**
      * Unpublish the most recent published channel message
      */
-    //TODO update this to unpublish a specific channel message, add a method to unpublish all channel messages
-    private void unpublish() {
-        Log.i(TAG, "Unpublishing.");
-        Nearby.Messages.unpublish(mGoogleApiClient, mPubMessage);
+    //TODO update this to unpublishMessage a specific channel message, add a method to unpublishMessage all channel messages
+    private void unpublishMessage(Message message) {
+        Log.i(TAG, "Unpublishing message: " + ChannelObject.fromNearbyMessage(message).getChannelTitle());
+        Nearby.Messages.unpublish(mGoogleApiClient, message);
+    }
+
+    private void unpublishAll(){
+        Log.i(TAG, "Unpublishing all.");
     }
 
     private void unsubscribe(){
@@ -256,6 +287,22 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private static void showSnackbar(String message){
         if (mContainer != null){
             Snackbar.make(mContainer, message, Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    private void storeChannelsInSharedPreferences(ArrayList<ChannelObject> channelObjects){
+        if (!channelObjects.isEmpty()){
+            // Get String Set's of the channel titles and topics for saving in SharedPreferences
+            Set<String> channelTitles = new HashSet<>();
+            Set<String> channelTopics = new HashSet<>();
+            for(ChannelObject channelObject : channelObjects){
+                channelTitles.add(channelObject.getChannelTitle());
+                channelTopics.add(channelObject.getChannelTopic());
+                Log.d("preparing prefs", "Storing the following channel: " + channelObject.getChannelTitle() + ", " + channelObject.getChannelTopic());
+            }
+            // Save to mSharedPreferences
+            mSharedPreferences.edit().putStringSet(SHARED_PREFS_CHANNEL_TITLE_KEY, channelTitles).apply();
+            mSharedPreferences.edit().putStringSet(SHARED_PREFS_CHANNEL_TOPIC_KEY, channelTopics).apply();
         }
     }
 }

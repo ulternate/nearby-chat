@@ -1,6 +1,7 @@
 package com.danielcswain.nearbychat.Channels;
 
 import com.google.android.gms.nearby.messages.Message;
+import com.google.gson.Gson;
 
 import java.nio.charset.Charset;
 
@@ -11,9 +12,10 @@ import java.nio.charset.Charset;
  */
 public class ChannelObject {
 
-    private String channelTitle;
-    private String channelTopic;
-    private Boolean channelPrivate;
+    private static final Gson gson = new Gson();
+    private final String channelTitle;
+    private final String channelTopic;
+    private final Boolean channelPrivate;
 
     /**
      * Constructor to create a chat channel object
@@ -29,13 +31,14 @@ public class ChannelObject {
 
     public static Message newNearbyMessage(String channelTitle, String channelTopic){
         ChannelObject channelObject = new ChannelObject(channelTitle, channelTopic, false);
-        return new Message(channelObject.getChannelTitle().getBytes(Charset.forName("UTF-8")), channelTopic);
+        return new Message(gson.toJson(channelObject).getBytes(Charset.forName("UTF-8")), "Channel");
     }
 
     public static ChannelObject fromNearbyMessage(Message message){
         String nearbyMessageString = new String(message.getContent()).trim();
-        String nearbyMessageType = message.getType().trim();
-        return new ChannelObject(nearbyMessageString, nearbyMessageType, false);
+        return gson.fromJson(
+                (new String(nearbyMessageString.getBytes(Charset.forName("UTF-8")))),
+                ChannelObject.class);
     }
 
     public String getChannelTitle() {
@@ -50,15 +53,4 @@ public class ChannelObject {
         return channelPrivate;
     }
 
-    public void setChannelTitle(String channelTitle) {
-        this.channelTitle = channelTitle;
-    }
-
-    public void setChannelTopic(String channelTopic) {
-        this.channelTopic = channelTopic;
-    }
-
-    public void setChannelPrivate(Boolean channelPrivate) {
-        this.channelPrivate = channelPrivate;
-    }
 }

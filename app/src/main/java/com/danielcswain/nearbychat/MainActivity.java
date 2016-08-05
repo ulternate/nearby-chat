@@ -33,13 +33,16 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static GoogleApiClient mGoogleApiClient;
-    private String NEW_CHAT_DIALOG_TAG = "New Chat Dialog";
+    private static final String NEW_CHAT_DIALOG_TAG = NewChatDialogFragment.class.getSimpleName();
     private static final int REQUEST_RESOLVE_ERROR = 1001;
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String NEARBY_PUBLISH_CHANNEL_SUCCESS = String.valueOf(R.string.nearby_publish_channel_success);
+    private static final String NEARBY_PUBLISH_CHANNEL_FAILED_STATUS = String.valueOf(R.string.nearby_publish_channel_failed_status);
+    private static final String NEARBY_SUBSCRIPTION_CHANNEL_SUCCESS = String.valueOf(R.string.nearby_subscription_success);
+    private static final String NEARBY_SUBSCRIPTION_CHANNEL_FAILED_STATUS = String.valueOf(R.string.nearby_subscription_failed_status);
 
     public static ChannelListAdapter mChannelListAdapter;
     private ArrayList<ChannelObject> channelObjects;
-//    private GoogleApiClient mGoogleApiClient;
     public static Message mPubMessage;
     private static View mContainer;
     private MessageListener mMessageListener;
@@ -51,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Get the root view for showing a snackbar
         mContainer = findViewById(R.id.channel_list).getRootView();
 
         // Get the channel list view and layout title text view
@@ -60,9 +64,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         // Initiate the channel ArrayList and ListAdapter
         channelObjects = new ArrayList<>();
         mChannelListAdapter = new ChannelListAdapter(this, channelObjects);
-
-        // Add a fake channel to the ArrayList
-//        channelObjects.add(new ChannelObject("Group Chat", "A place for group discussion on the Group Project", true));
 
         // Set the channel list title text and the connect the listAdapter to the ListView
         channelListTitle.setText(R.string.channel_list_title_no_channels);
@@ -90,40 +91,46 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
+        // Build the GoogleApiClient to use the Nearby.Message API
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Nearby.MESSAGES_API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
 
+        // Message Listener used for the subscription to the NearbyAPI to get the nearby chat channels
         mMessageListener = new MessageListener() {
             @Override
             public void onFound(final Message message) {
-                // Called when a new message is found.
+                // Add the nearby channel to the channel list
                 mChannelListAdapter.add(ChannelObject.fromNearbyMessage(message));
             }
 
             @Override
             public void onLost(final Message message) {
-                // Called when a message is no longer detectable nearby.
+                // Remove the nearby channel from the channel list when it is no longer nearby
                 mChannelListAdapter.remove(ChannelObject.fromNearbyMessage(message));
             }
         };
     }
 
+    /**
+     * Connect to the GoogleApiClient when onStart is called
+     */
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("onStart", "onStart called");
         mGoogleApiClient.connect();
     }
 
+    /**
+     * When the activity is no longer in view and onStop is called, unpublish and unsubscribe and
+     * disconnect from the GoogleApiClient if it is connected.
+     */
     @Override
     public void onStop() {
-
         unpublish();
         unsubscribe();
-
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
@@ -152,11 +159,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Subscribe to any Nearby devices when connected via the GoogleApiClient
+     */
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        //TODO
-//        Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
-
         subscribe();
     }
 
@@ -165,6 +172,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         //TODO
     }
 
+    /**
+     * Prompt the user to approve the Nearby Api connection if the connection failed
+     */
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         if (connectionResult.hasResolution()) {
@@ -191,34 +201,48 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
-    public static void publishMessage(Message message){
+    /**
+     * Publish a Nearby Message and if successful add the chat channel to the list adapter
+     * Show a snackbar to notify of success or failure
+     */
+    public static void publishMessage(final Message message){
         Nearby.Messages.publish(mGoogleApiClient, message)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
                         if (status.isSuccess()) {
-                            Log.i(TAG, "Published successfully.");
+                            // Add the chat channel to the channel list
+                            mChannelListAdapter.add(ChannelObject.fromNearbyMessage(message));
+                            showSnackbar(NEARBY_PUBLISH_CHANNEL_SUCCESS);
                         } else {
-                            logAndShowSnackbar("Could not publish, status = " + status);
+                            showSnackbar(NEARBY_PUBLISH_CHANNEL_FAILED_STATUS + status);
                         }
                     }
                 });
     }
 
+    /**
+     * Subscribe to receive nearby chat channels.
+     * Show a snackbar to notify of success or failure
+     */
     private void subscribe(){
         Nearby.Messages.subscribe(mGoogleApiClient, mMessageListener)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
                         if (status.isSuccess()) {
-                            Log.i(TAG, "Subscribed successfully.");
+                            showSnackbar(NEARBY_SUBSCRIPTION_CHANNEL_SUCCESS);
                         } else {
-                            logAndShowSnackbar("Could not subscribe, status = " + status);
+                            showSnackbar(NEARBY_SUBSCRIPTION_CHANNEL_FAILED_STATUS + status);
                         }
                     }
                 });
     }
 
+    /**
+     * Unpublish the most recent published channel message
+     */
+    //TODO update this to unpublish a specific channel message, add a method to unpublish all channel messages
     private void unpublish() {
         Log.i(TAG, "Unpublishing.");
         Nearby.Messages.unpublish(mGoogleApiClient, mPubMessage);
@@ -229,7 +253,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         Nearby.Messages.unsubscribe(mGoogleApiClient, mMessageListener);
     }
 
-    private static void logAndShowSnackbar(String message){
+    private static void showSnackbar(String message){
         if (mContainer != null){
             Snackbar.make(mContainer, message, Snackbar.LENGTH_SHORT).show();
         }

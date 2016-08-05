@@ -13,7 +13,6 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.danielcswain.nearbychat.Channels.ChannelObject;
 import com.danielcswain.nearbychat.MainActivity;
 import com.danielcswain.nearbychat.R;
 
@@ -32,8 +31,6 @@ public class NewChatDialogFragment extends DialogFragment {
 
     /**
      * Initiate the custom dialog using the custom layout
-     * @param savedInstanceState
-     * @return the dialog object created by AlertDialog.Builder using the custom layout
      */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -83,6 +80,11 @@ public class NewChatDialogFragment extends DialogFragment {
         return builder.create();
     }
 
+    /**
+     * The positiveButton onClickListener is assigned in the onStart method so the dialog isn't
+     * dismissed on the button click without the dialog.dismiss() being called. This allows for
+     * error checking of the dialog's EditText fields
+     */
     @Override
     public void onStart() {
         super.onStart();
@@ -105,18 +107,14 @@ public class NewChatDialogFragment extends DialogFragment {
                             if (!channelPassword.isEmpty()) {
                                 // Add a private channel to the Channel list
                                 // TODO make this work with NearbyAPI
-                                // MainActivity.mChannelListAdapter.add(new ChannelObject(channelName, channelTopic, true));
                             } else {
                                 Toast.makeText(getActivity(), R.string.dialog_channel_empty_password_error, Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            // Add a public channel to the Channel list
-                            MainActivity.mChannelListAdapter.add(new ChannelObject(channelName, channelTopic, false));
-                            // Prepare the message that will be published by the device
-                            MainActivity.mPubMessage = ChannelObject.newNearbyMessage(channelName, channelTopic);
+                            // Try and publish a message with the Channel information (if successful a channel will be added
+                            // to the main activity list adapter.
                             MainActivity.publishMessage(MainActivity.mPubMessage);
                         }
-
                         NewChatDialogFragment.this.getDialog().dismiss();
                     } else {
                         Toast.makeText(getActivity(), R.string.dialog_channel_empty_fields_error, Toast.LENGTH_SHORT).show();

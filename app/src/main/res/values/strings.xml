@@ -9,7 +9,11 @@
     <string name="cancel">Cancel</string>
     <string name="dialog_channel_title">Create New Nearby Chat Channel</string>
     <string name="dialog_channel_empty_fields_error">Please enter values for the chat channel name and topic and try again</string>
-    <string name="channel_list_title_no_channels">No Nearby Chat Channels Nearby, Create One Below</string>
+    <string name="channel_list_title_no_channels">No nearby chat channels nearby, create one below</string>
     <string name="channel_list_title">The Following Chat Channels Are Nearby</string>
     <string name="dialog_channel_empty_password_error">To make a private channel you must enter the password and share it with those you wish to have access</string>
+    <string name="nearby_subscription_success">Connected successfully. Any Nearby chat\'s will appear above.</string>
+    <string name="nearby_publish_channel_success">Channel published successfully.</string>
+    <string name="nearby_publish_channel_failed_status">Could not publish chat to nearby devices, status:</string>
+    <string name="nearby_subscription_failed_status">Could not subscribe to nearby chats, status:</string>
 </resources>

@@ -29,6 +29,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.messages.Message;
 import com.google.android.gms.nearby.messages.MessageListener;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,16 +42,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private static final int REQUEST_RESOLVE_ERROR = 1001;
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String SHARED_PREFS_FILE = "NearbyChatPreferences";
-    private static final String SHARED_PREFS_CHANNEL_TITLE_KEY = "title";
-    private static final String SHARED_PREFS_CHANNEL_TOPIC_KEY = "topic";
+    private static final String SHARED_PREFS_CHANNEL_KEY = "channels";
 
     public static ChannelListAdapter mChannelListAdapter;
-    private ArrayList<ChannelObject> channelObjects;
+    public static ArrayList<ChannelObject> channelObjects;
     public static Message mPubMessage;
     private static View mContainer;
-    private MessageListener mMessageListener;
-    private SharedPreferences mSharedPreferences;
+    private static MessageListener mMessageListener;
+    private static SharedPreferences mSharedPreferences;
     private static Context mContext;
+    private static final Gson gson = new Gson();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,8 +122,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         };
 
-        // Get the shared preferences for temporarily storing the chat channel information
+        // Get the shared preferences used for temporarily storing the chat channel information
         mSharedPreferences = getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE);
+
+        // The following is to only run on the initial launch of the application
+        if (MainApplication.firstStart){
+            // Clear the sharedPreferences as no channels will be published until user specifies (no chats persist on close)
+            mSharedPreferences.edit().clear().apply();
+
+            // Set MainApplication.firstStart to false to stop this block repeating when onCreate is called again without an application relaunch
+            MainApplication.setFirstStart(false);
+        }
     }
 
     /**
@@ -135,27 +145,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     /**
-     * Get any previously published channel messages from the shared preferences and re publish them.
-     */
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Set<String> channelTitles = mSharedPreferences.getStringSet(SHARED_PREFS_CHANNEL_TITLE_KEY, new HashSet<String>());
-        Set<String> channelTopics = mSharedPreferences.getStringSet(SHARED_PREFS_CHANNEL_TOPIC_KEY, new HashSet<String>());
-
-        Log.d("titles", channelTitles.toString());
-        Log.d("topics", channelTopics.toString());
-    }
-
-    /**
-     * When the activity is no longer in view and onStop is called, unpublishMessage and unsubscribe and
+     * When the activity is no longer in view and onStop is called, unpublish and unsubscribe and
      * disconnect from the GoogleApiClient if it is connected.
      */
     @Override
     public void onStop() {
-//        unpublishMessage(mPubMessage);
-        // Store the published
-        storeChannelsInSharedPreferences(channelObjects);
+        // Store the channels started by the user, these will be re published in onResume
+        storeUsersChannelsInSharedPreferences(channelObjects);
+        unpublish();
         unsubscribe();
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
@@ -191,6 +188,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         subscribe();
+        // Get the Set of channel JSONObject strings from the shared preferences (channels the user had published in
+        // this current session).
+        Set<String> channels = mSharedPreferences.getStringSet(SHARED_PREFS_CHANNEL_KEY, new HashSet<String>());
+        // If the user had published a chat channel in this session then re-publish it and add it back to the chat channel list
+        for (String channel: channels){
+            ChannelObject channelObject = gson.fromJson(channel, ChannelObject.class);
+            publishMessage(ChannelObject.newNearbyMessage(channelObject));
+        }
     }
 
     @Override
@@ -237,10 +242,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     @Override
                     public void onResult(@NonNull Status status) {
                         if (status.isSuccess()) {
-                            // Add the chat channel to the channel list
+                            // Add the chat channel to the channel list if it isn't there already
                             mPubMessage = message;
-                            mChannelListAdapter.add(ChannelObject.fromNearbyMessage(message));
-                            showSnackbar(mContext.getString(R.string.nearby_publish_channel_success));
+                            ChannelObject publishedChannel = ChannelObject.fromNearbyMessage(message);
+                            if(channelObjects.isEmpty() || !channelObjects.contains(publishedChannel)){
+                                channelObjects.add(publishedChannel);
+                                mChannelListAdapter.notifyDataSetChanged();
+                                showSnackbar(mContext.getString(R.string.nearby_publish_channel_success));
+                            }
                         } else {
                             showSnackbar(mContext.getString(R.string.nearby_publish_channel_failed_status) + status);
                         }
@@ -266,17 +275,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 });
     }
 
-    /**
-     * Unpublish the most recent published channel message
-     */
-    //TODO update this to unpublishMessage a specific channel message, add a method to unpublishMessage all channel messages
-    private void unpublishMessage(Message message) {
-        Log.i(TAG, "Unpublishing message: " + ChannelObject.fromNearbyMessage(message).getChannelTitle());
-        Nearby.Messages.unpublish(mGoogleApiClient, message);
-    }
-
-    private void unpublishAll(){
-        Log.i(TAG, "Unpublishing all.");
+    private void unpublish() {
+        Log.i(TAG, "Unpublishing message: " + ChannelObject.fromNearbyMessage(mPubMessage).getChannelTitle());
+        Nearby.Messages.unpublish(mGoogleApiClient, mPubMessage);
     }
 
     private void unsubscribe(){
@@ -290,19 +291,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
-    private void storeChannelsInSharedPreferences(ArrayList<ChannelObject> channelObjects){
+    /**
+     * Store the chat channels the user has opened in this instance of the application in SharedPreferences
+     * @param channelObjects the list of channel objects the user is nearby (both published and subscribed to)
+     */
+    private void storeUsersChannelsInSharedPreferences(ArrayList<ChannelObject> channelObjects){
         if (!channelObjects.isEmpty()){
-            // Get String Set's of the channel titles and topics for saving in SharedPreferences
-            Set<String> channelTitles = new HashSet<>();
-            Set<String> channelTopics = new HashSet<>();
+            // Create a String set for the ChannelObjects as Sets of JSONObjects
+            Set<String> channels = new HashSet<>();
             for(ChannelObject channelObject : channelObjects){
-                channelTitles.add(channelObject.getChannelTitle());
-                channelTopics.add(channelObject.getChannelTopic());
-                Log.d("preparing prefs", "Storing the following channel: " + channelObject.getChannelTitle() + ", " + channelObject.getChannelTopic());
+                // Only store the channels the user created/owns as the other channels may not be active
+                // when the app is relaunched.
+                if (channelObject.getChannelIsUsers()) {
+                    String channelJSON = gson.toJson(channelObject);
+                    channels.add(channelJSON);
+                }
             }
             // Save to mSharedPreferences
-            mSharedPreferences.edit().putStringSet(SHARED_PREFS_CHANNEL_TITLE_KEY, channelTitles).apply();
-            mSharedPreferences.edit().putStringSet(SHARED_PREFS_CHANNEL_TOPIC_KEY, channelTopics).apply();
+            mSharedPreferences.edit().putStringSet(SHARED_PREFS_CHANNEL_KEY, channels).apply();
         }
     }
 }

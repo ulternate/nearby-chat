@@ -1,9 +1,12 @@
 package com.danielcswain.nearbychat.Channels;
 
+import android.util.Log;
+
 import com.google.android.gms.nearby.messages.Message;
 import com.google.gson.Gson;
 
 import java.nio.charset.Charset;
+import java.util.Objects;
 
 /**
  * Created by ulternate on 3/08/2016.
@@ -31,6 +34,10 @@ public class ChannelObject {
         this.channelIsUsers = channelIsUsers;
     }
 
+    public static Message newNearbyMessage(ChannelObject channelObject){
+        return new Message(gson.toJson(channelObject).getBytes(Charset.forName("UTF-8")), "Channel");
+    }
+
     public static Message newNearbyMessage(String channelTitle, String channelTopic, Boolean channelIsUsers){
         ChannelObject channelObject = new ChannelObject(channelTitle, channelTopic, false, channelIsUsers);
         return new Message(gson.toJson(channelObject).getBytes(Charset.forName("UTF-8")), "Channel");
@@ -41,6 +48,22 @@ public class ChannelObject {
         return gson.fromJson(
                 (new String(nearbyMessageString.getBytes(Charset.forName("UTF-8")))),
                 ChannelObject.class);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        boolean match = false;
+        Log.d("matching", "matching objects");
+        if (obj != null && obj instanceof ChannelObject){
+            if (Objects.equals(((ChannelObject) obj).channelTitle, this.channelTitle) &&
+                    Objects.equals(((ChannelObject) obj).channelTopic, this.channelTopic) &&
+                    Objects.equals(((ChannelObject) obj).channelPrivate, this.channelPrivate) &&
+                    Objects.equals(((ChannelObject) obj).channelIsUsers, this.channelIsUsers)){
+                match = true;
+                Log.d("matched", "it was a match");
+            }
+        }
+        return match;
     }
 
     public String getChannelTitle() {

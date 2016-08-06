@@ -40,7 +40,7 @@ import java.util.Set;
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String NEW_CHAT_DIALOG_TAG = NewChatDialogFragment.class.getSimpleName();
-    private static final int REQUEST_RESOLVE_ERROR = 1001;
+    public static final int REQUEST_RESOLVE_ERROR = 1001;
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String SHARED_PREFS_FILE = "NearbyChatPreferences";
     private static final String SHARED_PREFS_CHANNEL_KEY = "channels";
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Log.d("lifecycle", "main activity onCreate called");
+
         // Get the application context and the application
         sContext = getApplicationContext();
         sApplication = (MainApplication) getApplication();
@@ -116,8 +116,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         sMessageListener = new MessageListener() {
             @Override
             public void onFound(final Message message) {
-                // Add the nearby channel to the channel list
-                channelListAdapter.add(ChannelObject.fromNearbyMessage(message));
+                // Add the nearby channel to the channel list if it doesn't exist
+                checkAndUpdateIfChannelIsNotInChannelList(ChannelObject.fromNearbyMessage(message));
             }
 
             @Override
@@ -146,7 +146,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("lifecycle", "main activity onStart called");
         sGoogleApiClient.connect();
     }
 
@@ -256,14 +255,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     @Override
                     public void onResult(@NonNull Status status) {
                         if (status.isSuccess()) {
-                            // Add the chat channel to the channel list if it isn't there already
+                            // Store it as the last published message
                             pubMessage = message;
-                            ChannelObject publishedChannel = ChannelObject.fromNearbyMessage(message);
-                            if(channelObjects.isEmpty() || !channelObjects.contains(publishedChannel)){
-                                channelObjects.add(publishedChannel);
-                                channelListAdapter.notifyDataSetChanged();
-                                showSnackbar(sContext.getString(R.string.nearby_publish_channel_success));
-                            }
+                            // Add the chat channel to the channel list if it isn't there already
+                            checkAndUpdateIfChannelIsNotInChannelList(ChannelObject.fromNearbyMessage(message));
+                            showSnackbar(sContext.getString(R.string.nearby_publish_channel_success));
                         } else {
                             showSnackbar(sContext.getString(R.string.nearby_publish_channel_failed_status) + status);
                         }
@@ -314,6 +310,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private static void showSnackbar(String message){
         if (sContainer != null){
             Snackbar.make(sContainer, message, Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    private static void checkAndUpdateIfChannelIsNotInChannelList(ChannelObject channel){
+        if(channelObjects.isEmpty() || !channelObjects.contains(channel)) {
+            channelObjects.add(channel);
+            channelListAdapter.notifyDataSetChanged();
         }
     }
 

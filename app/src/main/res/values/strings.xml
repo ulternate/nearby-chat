@@ -20,4 +20,54 @@
     <string name="action_enter_chat">Enter Chat</string>
     <string name="select_avatar_colour">Select Avatar Colour</string>
     <string name="welcome_message">Chat with people nearby you.</string>
+
+    <string-array name="animals">
+        <item>Armadillo</item>
+        <item>Buffalo</item>
+        <item>Cheetah</item>
+        <item>Dingo</item>
+        <item>Eagle</item>
+        <item>Ferret</item>
+        <item>Giraffe</item>
+        <item>Hippo</item>
+        <item>Iguana</item>
+        <item>Jaguar</item>
+        <item>Kangaroo</item>
+        <item>Llama</item>
+        <item>Monkey</item>
+        <item>Newt</item>
+        <item>Orangutan</item>
+        <item>Penguin</item>
+        <item>Quail</item>
+        <item>Rabbit</item>
+        <item>Snake</item>
+        <item>Tiger</item>
+        <item>Urial</item>
+        <item>Vulture</item>
+        <item>Wolf</item>
+        <item>Xerus</item>
+        <item>Yak</item>
+        <item>Zebra</item>
+    </string-array>
+
+    <string-array name="moods_and_adjectives">
+        <item>Angry</item>
+        <item>Happy</item>
+        <item>Sad</item>
+        <item>Clever</item>
+        <item>Clean</item>
+        <item>Fancy</item>
+        <item>Obedient</item>
+        <item>Brave</item>
+        <item>Bewildered</item>
+        <item>Clumsy</item>
+        <item>Tiny</item>
+        <item>Large</item>
+        <item>Deafening</item>
+        <item>Quiet</item>
+        <item>Melodic</item>
+        <item>Whispering</item>
+        <item>Cold</item>
+        <item>Warm</item>
+    </string-array>
 </resources>

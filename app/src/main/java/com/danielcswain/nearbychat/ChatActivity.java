@@ -129,16 +129,16 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_RESOLVE_ERROR) {
-            if (resultCode == RESULT_OK) {
-                MainActivity.sGoogleApiClient.connect();
-            } else {
-                Log.e(TAG, "GoogleApiClient connection failed. Unable to resolve.");
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (requestCode == REQUEST_RESOLVE_ERROR) {
+//            if (resultCode == RESULT_OK) {
+//                MainActivity.sGoogleApiClient.connect();
+//            } else {
+//                Log.e(TAG, "GoogleApiClient connection failed. Unable to resolve.");
+//            }
+//        } else {
+//            super.onActivityResult(requestCode, resultCode, data);
+//        }
+//    }
 }

@@ -18,4 +18,6 @@
     <string name="nearby_subscription_failed_status">Could not subscribe to nearby chats, status:</string>
     <string name="username">Username</string>
     <string name="action_enter_chat">Enter Chat</string>
+    <string name="select_avatar_colour">Select Avatar Colour</string>
+    <string name="welcome_message">Chat with people nearby you.</string>
 </resources>

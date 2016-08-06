@@ -13,6 +13,17 @@
     tools:context="com.danielcswain.nearbychat.MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <TextView
+        android:id="@+id/welcome_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="@string/welcome_message"
+        android:textSize="@dimen/text_title"
+        android:layout_above="@+id/username_field"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_48dp"
+        />
+
     <EditText
         android:id="@+id/username_field"
         android:layout_width="match_parent"
@@ -27,8 +38,8 @@
 
     <ImageButton
         android:id="@+id/button_username_generate"
-        android:layout_width="@dimen/message_send_button"
-        android:layout_height="@dimen/message_send_button"
+        android:layout_width="@dimen/button_circular_40dp"
+        android:layout_height="@dimen/button_circular_40dp"
         android:layout_alignParentRight="true"
         android:layout_alignBottom="@+id/username_field"
         android:layout_marginBottom="8dp"
@@ -42,19 +53,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin_32dp"
-        android:text="Pick Avatar Colour"
+        android:layout_alignLeft="@+id/username_field"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin_4dp"
+        android:text="@string/select_avatar_colour"
         android:textSize="@dimen/text_title"
         />
 
     <ImageButton
         android:id="@+id/button_avatar_colour_picker"
-        android:layout_width="@dimen/message_send_button"
-        android:layout_height="@dimen/message_send_button"
+        android:layout_width="@dimen/button_circular_40dp"
+        android:layout_height="@dimen/button_circular_40dp"
         android:layout_alignParentRight="true"
         android:layout_alignBottom="@+id/avatar_colour_title"
         android:layout_marginRight="@dimen/activity_horizontal_margin_32dp"
-        android:src="@drawable/ic_brush_light"
+        android:src="@drawable/ic_avatar_circle_light"
         android:background="@drawable/bg_circle_accent"
         />
 

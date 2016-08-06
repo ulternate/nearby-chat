@@ -44,8 +44,8 @@
 
         <ImageButton
             android:id="@+id/message_send_button"
-            android:layout_width="@dimen/message_send_button"
-            android:layout_height="@dimen/message_send_button"
+            android:layout_width="@dimen/button_message_send_32dp"
+            android:layout_height="@dimen/button_message_send_32dp"
             android:src="@android:drawable/ic_menu_send"
             android:background="@color/colorAccent"
             android:layout_gravity="center_vertical"/>

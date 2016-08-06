@@ -37,7 +37,6 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    private static GoogleApiClient sGoogleApiClient;
     private static final String NEW_CHAT_DIALOG_TAG = NewChatDialogFragment.class.getSimpleName();
     private static final int REQUEST_RESOLVE_ERROR = 1001;
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -54,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private static final Gson sGson = new Gson();
 
     protected static MainApplication sApplication;
+    protected static GoogleApiClient sGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        Log.d("lifecycle", "main activity onCreate called");
         // Get the application context and the application
         sContext = getApplicationContext();
         sApplication = (MainApplication) getApplication();
@@ -144,23 +144,32 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onStart() {
         super.onStart();
+        Log.d("lifecycle", "main activity onStart called");
         sGoogleApiClient.connect();
     }
 
     /**
-     * When the activity is no longer in view and onStop is called, unpublish and unsubscribe and
-     * disconnect from the GoogleApiClient if it is connected.
+     * When the activity is leaving view and onPause is called, store the user channels and start
+     * an activity transition timer which will disconnect from the GoogleApiClient and unsubscribe/unpublish
+     * when executed. This timer will be cancelled in the onResume methods of other activities and
+     * should only be called when the app is closed or enters the background.
      */
     @Override
-    public void onStop() {
-        // Store the channels started by the user, these will be re published in onResume
+    protected void onPause() {
+        super.onPause();
+        // Store the channels started by the user
         storeUsersChannelsInSharedPreferences(channelObjects);
-        unpublish();
-        unsubscribe();
-        if (sGoogleApiClient.isConnected()) {
-            sGoogleApiClient.disconnect();
-        }
-        super.onStop();
+        // Start the MainApplication Activity Transition timer which disconnects from the GoogleApiClient
+        // if the app has entered the background.
+        MainApplication.startActivityTransitionTimer();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Stop the MainApplication Activity Transition timer if it hasn't executed, this keeps a connection
+        // to the GoogleApiClient if transitioning between activities.
+        MainApplication.stopActivityTransitionTimer();
     }
 
     @Override
@@ -190,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
      */
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        subscribe();
+        subscribeToNearbyChannels();
         // Get the Set of channel JSONObject strings from the shared preferences (channels the user had published in
         // this current session).
         Set<String> channels = sSharedPreferences.getStringSet(SHARED_PREFS_CHANNEL_KEY, new HashSet<String>());
@@ -264,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
      * Subscribe to receive nearby chat channels.
      * Show a snackbar to notify of success or failure
      */
-    private void subscribe(){
+    private static void subscribeToNearbyChannels(){
         Nearby.Messages.subscribe(sGoogleApiClient, sMessageListener)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
@@ -278,12 +287,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 });
     }
 
-    private void unpublish() {
+    public static void unpublishNearbyChannel() {
         Log.i(TAG, "Unpublishing message: " + ChannelObject.fromNearbyMessage(pubMessage).getChannelTitle());
         Nearby.Messages.unpublish(sGoogleApiClient, pubMessage);
     }
 
-    private void unsubscribe(){
+    public static void unsubscribeFromNearbyChannels(){
         Log.i(TAG, "Unsubscribing.");
         Nearby.Messages.unsubscribe(sGoogleApiClient, sMessageListener);
     }

@@ -1,6 +1,7 @@
 package com.danielcswain.nearbychat;
 
 import android.app.Application;
+import android.util.Log;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -11,11 +12,11 @@ import java.util.TimerTask;
 public class MainApplication extends Application {
 
     public static boolean firstStart = true;
-    public boolean wasInBackground;
+    public static boolean wasInBackground;
 
-    private Timer mActivityTransitionTimer;
-    private TimerTask mActivityTransitionTimerTask;
-    private final long MAX_ACTIVITY_TRANSITION_TIME_MS = 2000;
+    private static Timer sActivityTransitionTimer;
+    private static TimerTask sActivityTransitionTimerTask;
+    private static final long MAX_ACTIVITY_TRANSITION_TIME_MS = 2000;
 
     public MainApplication(){
 
@@ -30,29 +31,50 @@ public class MainApplication extends Application {
         firstStart = bool;
     }
 
-    public void startActivityTransitionTimer(){
-        this.mActivityTransitionTimer = new Timer();
-        this.mActivityTransitionTimerTask = new TimerTask() {
+
+    /**
+     * Create and start a timer and timer task that will execute after a short delay if not stopped.
+     * If this tasks executes (it wasn't stopped) then the GoogleApiClient will be disconnected
+     * after any channel/messages were unpublished and the phone has unsubscribed from any Nearby channels/messages.
+     *
+     * This timer task is called in the activities onStop method and canceled in the onStart call.
+     */
+    public static void startActivityTransitionTimer(){
+        sActivityTransitionTimer = new Timer();
+        sActivityTransitionTimerTask = new TimerTask() {
             @Override
             public void run() {
-                MainApplication.this.wasInBackground = true;
-                // Disconnect from the NearbyAPI client here
+                Log.d("timer", "Activity transition timer has run");
+                //Set was in background to true
+                wasInBackground = true;
+                // Unpublish and unsubscribe from the nearby channels.
+                MainActivity.unpublishNearbyChannel();
+                MainActivity.unsubscribeFromNearbyChannels();
+                // Disconnect from the NearbyAPI client as the app has now entered the background.
+                if (MainActivity.sGoogleApiClient.isConnected()){
+                    MainActivity.sGoogleApiClient.disconnect();
+                }
             }
         };
-
-        this.mActivityTransitionTimer.schedule(mActivityTransitionTimerTask, MAX_ACTIVITY_TRANSITION_TIME_MS);
+        // Schedule the timer task to run after the MAX_ACTIVITY_TRANSITION_TIME_MS delay has passed.
+        sActivityTransitionTimer.schedule(sActivityTransitionTimerTask, MAX_ACTIVITY_TRANSITION_TIME_MS);
     }
 
-    public void stopActivityTransitionTimer(){
-        if (this.mActivityTransitionTimerTask != null){
-            this.mActivityTransitionTimerTask.cancel();
+    /**
+     * Stop the activity timer
+     */
+    public static void stopActivityTransitionTimer(){
+        if (sActivityTransitionTimerTask != null){
+            Log.d("timer", "Activity transition timer cancelled");
+            sActivityTransitionTimerTask.cancel();
         }
 
-        if (this.mActivityTransitionTimer != null){
-            this.mActivityTransitionTimer.cancel();
+        if (sActivityTransitionTimer != null){
+            Log.d("timer", "Activity transition timer cancelled");
+            sActivityTransitionTimer.cancel();
         }
 
-        this.wasInBackground = false;
+        wasInBackground = false;
     }
 
 

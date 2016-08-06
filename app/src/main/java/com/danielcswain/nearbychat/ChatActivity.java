@@ -3,10 +3,14 @@ package com.danielcswain.nearbychat;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -15,11 +19,16 @@ import android.widget.TextView;
 
 import com.danielcswain.nearbychat.Messages.MessageAdapter;
 import com.danielcswain.nearbychat.Messages.MessageObject;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+    private static final int REQUEST_RESOLVE_ERROR = 1002;
+    private static final String TAG = ChatActivity.class.getSimpleName();
 
     ArrayList<MessageObject> mMessageObjects;
     EditText mTextField;
@@ -89,8 +98,63 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Start the MainApplication Activity Transition timer which disconnects from the GoogleApiClient
+        // if the app has entered the background.
+        MainApplication.startActivityTransitionTimer();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Stop the MainApplication Activity Transition timer if it hasn't executed, this keeps a connection
+        // to the GoogleApiClient if transitioning between activities.
+        MainApplication.stopActivityTransitionTimer();
+    }
+
     public static void hideSoftKeyboard(Activity activity, View view){
         InputMethodManager mInputMethodManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         mInputMethodManager.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        //TODO handle subscription for the nearby messages in this channel
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    /**
+     * Prompt the user to approve the Nearby Api connection if the connection failed
+     */
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        if (connectionResult.hasResolution()) {
+            try {
+                connectionResult.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
+            } catch (IntentSender.SendIntentException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.e(TAG, "GoogleApiClient connection failed");
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_RESOLVE_ERROR) {
+            if (resultCode == RESULT_OK) {
+                MainActivity.sGoogleApiClient.connect();
+            } else {
+                Log.e(TAG, "GoogleApiClient connection failed. Unable to resolve.");
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }

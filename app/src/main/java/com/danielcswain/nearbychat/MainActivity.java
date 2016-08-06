@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private static Context mContext;
     private static final Gson gson = new Gson();
 
+    protected static MainApplication mApplication;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,8 +62,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Get the application context
+        // Get the application context and the application
         mContext = getApplicationContext();
+        mApplication = (MainApplication) getApplication();
 
         // Get the root view for showing a snackbar
         mContainer = findViewById(R.id.channel_list);

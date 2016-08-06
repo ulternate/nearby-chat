@@ -98,22 +98,6 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         });
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        // Start the MainApplication Activity Transition timer which disconnects from the GoogleApiClient
-        // if the app has entered the background.
-        MainApplication.startActivityTransitionTimer();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Stop the MainApplication Activity Transition timer if it hasn't executed, this keeps a connection
-        // to the GoogleApiClient if transitioning between activities.
-        MainApplication.stopActivityTransitionTimer();
-    }
-
     public static void hideSoftKeyboard(Activity activity, View view){
         InputMethodManager mInputMethodManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         mInputMethodManager.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);

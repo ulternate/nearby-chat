@@ -5,31 +5,69 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin_8dp"
+    android:paddingLeft="@dimen/activity_horizontal_margin_8dp"
+    android:paddingRight="@dimen/activity_horizontal_margin_8dp"
+    android:paddingTop="@dimen/activity_vertical_margin_8dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.danielcswain.nearbychat.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TextView
-        android:id="@+id/channel_list_title"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/username_field"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:textSize="@dimen/text_title"
-        android:textStyle="bold"
+        android:hint="@string/username"
+        android:layout_toLeftOf="@+id/button_username_generate"
+        android:layout_above="@+id/avatar_colour_title"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_32dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin_32dp"
+        android:layout_marginRight="8dp"
         />
 
-    <ListView
-        android:id="@+id/channel_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/channel_list_title"
-        android:layout_marginTop="@dimen/activity_vertical_margin_double"
-        android:divider="@null"
-        android:dividerHeight="@dimen/activity_vertical_margin_half"
+    <ImageButton
+        android:id="@+id/button_username_generate"
+        android:layout_width="@dimen/message_send_button"
+        android:layout_height="@dimen/message_send_button"
+        android:layout_alignParentRight="true"
+        android:layout_alignBottom="@+id/username_field"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="@dimen/activity_horizontal_margin_32dp"
+        android:src="@drawable/ic_loop_light"
+        android:background="@drawable/bg_circle_accent"
         />
+
+    <TextView
+        android:id="@+id/avatar_colour_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin_32dp"
+        android:text="Pick Avatar Colour"
+        android:textSize="@dimen/text_title"
+        />
+
+    <ImageButton
+        android:id="@+id/button_avatar_colour_picker"
+        android:layout_width="@dimen/message_send_button"
+        android:layout_height="@dimen/message_send_button"
+        android:layout_alignParentRight="true"
+        android:layout_alignBottom="@+id/avatar_colour_title"
+        android:layout_marginRight="@dimen/activity_horizontal_margin_32dp"
+        android:src="@drawable/ic_brush_light"
+        android:background="@drawable/bg_circle_accent"
+        />
+
+    <Button
+        android:id="@+id/button_enter_chat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/avatar_colour_title"
+        android:layout_marginTop="@dimen/activity_vertical_margin_32dp"
+        android:layout_centerHorizontal="true"
+        android:text="@string/action_enter_chat"
+        android:textColor="@color/textLight"
+        android:background="@drawable/bg_button"
+        />
+
 </RelativeLayout>

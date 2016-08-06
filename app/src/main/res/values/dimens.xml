@@ -1,18 +1,19 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">8dp</dimen>
-    <dimen name="activity_vertical_margin">8dp</dimen>
-    <dimen name="activity_horizontal_margin_double">16dp</dimen>
-    <dimen name="activity_vertical_margin_double">16dp</dimen>
-    <dimen name="activity_horizontal_margin_half">4dp</dimen>
-    <dimen name="activity_vertical_margin_half">4dp</dimen>
+    <dimen name="activity_horizontal_margin_4dp">4dp</dimen>
+    <dimen name="activity_vertical_margin_4dp">4dp</dimen>
+    <dimen name="activity_horizontal_margin_8dp">8dp</dimen>
+    <dimen name="activity_vertical_margin_8dp">8dp</dimen>
+    <dimen name="activity_horizontal_margin_16dp">16dp</dimen>
+    <dimen name="activity_vertical_margin_16dp">16dp</dimen>
+    <dimen name="activity_horizontal_margin_32dp">32dp</dimen>
+    <dimen name="activity_vertical_margin_32dp">32dp</dimen>
+    <dimen name="activity_horizontal_margin_48dp">48dp</dimen>
+    <dimen name="activity_vertical_margin_48dp">48dp</dimen>
     <dimen name="text_title">18sp</dimen>
     <dimen name="text_content">16sp</dimen>
     <dimen name="message_bubble_padding">8dp</dimen>
     <dimen name="message_bubble_margin">4dp</dimen>
     <dimen name="message_body_alignment_margin">110dp</dimen>
     <dimen name="message_send_button">32dp</dimen>
-    <dimen name="channel_topic_min_height">32dp</dimen>
-    <dimen name="channel_dialog_title_height">48dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
 </resources>

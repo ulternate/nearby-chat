@@ -16,4 +16,6 @@
     <string name="nearby_publish_channel_success">Channel published successfully.</string>
     <string name="nearby_publish_channel_failed_status">Could not publish chat to nearby devices, status:</string>
     <string name="nearby_subscription_failed_status">Could not subscribe to nearby chats, status:</string>
+    <string name="username">Username</string>
+    <string name="action_enter_chat">Enter Chat</string>
 </resources>

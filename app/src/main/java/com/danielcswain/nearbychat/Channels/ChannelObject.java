@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 
 import java.nio.charset.Charset;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Created by ulternate on 3/08/2016.
@@ -18,10 +19,12 @@ public class ChannelObject {
     private final String mChannelTopic;
     private final Boolean mChannelPrivate;
     private final Boolean mChannelIsUsers;
+    private String mChannelUuid;
+    private String mChannelToken;
 
     /**
      * Constructor to create a chat channel object
-     * @param channelTitle the chat channel's title
+     * @param channelTitle the chat channel's title, used to generate a UUID for the channel
      * @param channelTopic the chat channel's topic of discussion
      * @param channelPrivate whether the chat channel is private or not
      */
@@ -30,6 +33,9 @@ public class ChannelObject {
         this.mChannelTopic = channelTopic;
         this.mChannelPrivate = channelPrivate;
         this.mChannelIsUsers = channelIsUsers;
+        //TODO tokenise user's password when channel created.
+        this.mChannelToken = "";
+        this.mChannelUuid = UUID.fromString(channelTitle + UUID.randomUUID().toString()).toString();
     }
 
     public static Message newNearbyMessage(ChannelObject channelObject){
@@ -76,5 +82,13 @@ public class ChannelObject {
 
     public Boolean getmChannelIsUsers() {
         return mChannelIsUsers;
+    }
+
+    public String getmChannelToken() {
+        return mChannelToken;
+    }
+
+    public String getmChannelUuid() {
+        return mChannelUuid;
     }
 }

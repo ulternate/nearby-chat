@@ -10,4 +10,48 @@
     <color name="channelCard">#EEEEEE</color>
     <color name="textLight">#ffffff</color>
     <color name="textDark">#212121</color>
+
+    <color name="md_red_500">#f44336</color>
+    <color name="md_pink_500">#FF4081</color>
+    <color name="md_purple_500">#9C27B0</color>
+    <color name="md_deep_purple_500">#673AB7</color>
+    <color name="md_indigo_500">#3F51B5</color>
+    <color name="md_blue_500">#2196F3</color>
+    <color name="md_light_blue_500">#03A9F4</color>
+    <color name="md_cyan_500">#00BCD4</color>
+    <color name="md_teal_500">#009688</color>
+    <color name="md_green_500">#4CAF50</color>
+    <color name="md_light_green_500">#8BC34A</color>
+    <color name="md_lime_500">#CDDC39</color>
+    <color name="md_yellow_500">#FFEB3B</color>
+    <color name="md_amber_500">#FFC107</color>
+    <color name="md_orange_500">#FF9800</color>
+    <color name="md_deep_orange_500">#FF5722</color>
+    <color name="md_brown_500">#795548</color>
+    <color name="md_grey_500">#9E9E9E</color>
+    <color name="md_blue_grey_500">#607D8B</color>
+    <color name="md_white">#ffffff</color>
+
+    <array name="avatar_colours">
+        <item>@color/md_red_500</item>
+        <item>@color/md_pink_500</item>
+        <item>@color/md_purple_500</item>
+        <item>@color/md_deep_purple_500</item>
+        <item>@color/md_indigo_500</item>
+        <item>@color/md_blue_500</item>
+        <item>@color/md_light_blue_500</item>
+        <item>@color/md_cyan_500</item>
+        <item>@color/md_teal_500</item>
+        <item>@color/md_green_500</item>
+        <item>@color/md_light_green_500</item>
+        <item>@color/md_lime_500</item>
+        <item>@color/md_yellow_500</item>
+        <item>@color/md_amber_500</item>
+        <item>@color/md_orange_500</item>
+        <item>@color/md_deep_orange_500</item>
+        <item>@color/md_brown_500</item>
+        <item>@color/md_grey_500</item>
+        <item>@color/md_blue_grey_500</item>
+        <item>@color/md_white</item>
+    </array>
 </resources>

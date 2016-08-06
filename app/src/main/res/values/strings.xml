@@ -20,6 +20,7 @@
     <string name="action_enter_chat">Enter Chat</string>
     <string name="select_avatar_colour">Select Avatar Colour</string>
     <string name="welcome_message">Chat with people nearby you.</string>
+    <string name="error_empty_username">Please enter or generate a username before joining the chat</string>
 
     <string-array name="animals">
         <item>Armadillo</item>

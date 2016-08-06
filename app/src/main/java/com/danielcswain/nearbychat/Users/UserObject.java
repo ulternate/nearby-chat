@@ -8,17 +8,17 @@ import java.util.UUID;
 public class UserObject {
 
     private String mUsername;
-    private int mColour;
+    private String mColourHex;
     private String mUuid;
 
-    public UserObject(String mUsername, int mColour){
+    public UserObject(String mUsername, String mColourHex){
         this.mUsername = mUsername;
-        this.mColour = mColour;
+        this.mColourHex = mColourHex;
         this.mUuid = UUID.randomUUID().toString();
     }
 
-    public int getColour() {
-        return mColour;
+    public String getColour() {
+        return mColourHex;
     }
 
     public String getUsername() {

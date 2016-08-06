@@ -46,8 +46,8 @@
             android:id="@+id/message_send_button"
             android:layout_width="@dimen/button_message_send_32dp"
             android:layout_height="@dimen/button_message_send_32dp"
-            android:src="@android:drawable/ic_menu_send"
-            android:background="@color/colorAccent"
+            android:src="@drawable/ic_send_light"
+            android:background="@drawable/bg_button"
             android:layout_gravity="center_vertical"/>
     </LinearLayout>
 

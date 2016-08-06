@@ -45,7 +45,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginRight="@dimen/activity_horizontal_margin_32dp"
         android:src="@drawable/ic_loop_light"
-        android:background="@drawable/bg_circle_username_generator"
+        android:background="@drawable/bg_button_circle"
         />
 
     <TextView
@@ -67,7 +67,7 @@
         android:layout_alignBottom="@+id/avatar_colour_title"
         android:layout_marginRight="@dimen/activity_horizontal_margin_32dp"
         android:src="@drawable/ic_avatar_circle_light"
-        android:background="@drawable/bg_circle_colour_picker"
+        android:background="@drawable/bg_button_circle_colour_picker"
         />
 
     <Button

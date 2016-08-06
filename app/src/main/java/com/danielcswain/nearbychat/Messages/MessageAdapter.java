@@ -100,6 +100,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder> {
      */
     @Override
     public int getItemCount() {
-        return mMessageObjects.size();
+        if (mMessageObjects != null) {
+            return mMessageObjects.size();
+        } else {
+            return 0;
+        }
     }
 }

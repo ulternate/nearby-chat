@@ -13,11 +13,11 @@ import java.util.Objects;
  */
 public class ChannelObject {
 
-    private static final Gson gson = new Gson();
-    private final String channelTitle;
-    private final String channelTopic;
-    private final Boolean channelPrivate;
-    private final Boolean channelIsUsers;
+    private static final Gson sGson = new Gson();
+    private final String mChannelTitle;
+    private final String mChannelTopic;
+    private final Boolean mChannelPrivate;
+    private final Boolean mChannelIsUsers;
 
     /**
      * Constructor to create a chat channel object
@@ -26,24 +26,24 @@ public class ChannelObject {
      * @param channelPrivate whether the chat channel is private or not
      */
     public ChannelObject(String channelTitle, String channelTopic, Boolean channelPrivate, Boolean channelIsUsers){
-        this.channelTitle = channelTitle;
-        this.channelTopic = channelTopic;
-        this.channelPrivate = channelPrivate;
-        this.channelIsUsers = channelIsUsers;
+        this.mChannelTitle = channelTitle;
+        this.mChannelTopic = channelTopic;
+        this.mChannelPrivate = channelPrivate;
+        this.mChannelIsUsers = channelIsUsers;
     }
 
     public static Message newNearbyMessage(ChannelObject channelObject){
-        return new Message(gson.toJson(channelObject).getBytes(Charset.forName("UTF-8")), "Channel");
+        return new Message(sGson.toJson(channelObject).getBytes(Charset.forName("UTF-8")), "Channel");
     }
 
     public static Message newNearbyMessage(String channelTitle, String channelTopic, Boolean channelIsUsers){
         ChannelObject channelObject = new ChannelObject(channelTitle, channelTopic, false, channelIsUsers);
-        return new Message(gson.toJson(channelObject).getBytes(Charset.forName("UTF-8")), "Channel");
+        return new Message(sGson.toJson(channelObject).getBytes(Charset.forName("UTF-8")), "Channel");
     }
 
     public static ChannelObject fromNearbyMessage(Message message){
         String nearbyMessageString = new String(message.getContent()).trim();
-        return gson.fromJson(
+        return sGson.fromJson(
                 (new String(nearbyMessageString.getBytes(Charset.forName("UTF-8")))),
                 ChannelObject.class);
     }
@@ -52,29 +52,29 @@ public class ChannelObject {
     public boolean equals(Object obj) {
         boolean match = false;
         if (obj != null && obj instanceof ChannelObject){
-            if (Objects.equals(((ChannelObject) obj).channelTitle, this.channelTitle) &&
-                    Objects.equals(((ChannelObject) obj).channelTopic, this.channelTopic) &&
-                    Objects.equals(((ChannelObject) obj).channelPrivate, this.channelPrivate) &&
-                    Objects.equals(((ChannelObject) obj).channelIsUsers, this.channelIsUsers)){
+            if (Objects.equals(((ChannelObject) obj).mChannelTitle, this.mChannelTitle) &&
+                    Objects.equals(((ChannelObject) obj).mChannelTopic, this.mChannelTopic) &&
+                    Objects.equals(((ChannelObject) obj).mChannelPrivate, this.mChannelPrivate) &&
+                    Objects.equals(((ChannelObject) obj).mChannelIsUsers, this.mChannelIsUsers)){
                 match = true;
             }
         }
         return match;
     }
 
-    public String getChannelTitle() {
-        return channelTitle;
+    public String getmChannelTitle() {
+        return mChannelTitle;
     }
 
-    public String getChannelTopic() {
-        return channelTopic;
+    public String getmChannelTopic() {
+        return mChannelTopic;
     }
 
-    public Boolean getChannelPrivate() {
-        return channelPrivate;
+    public Boolean getmChannelPrivate() {
+        return mChannelPrivate;
     }
 
-    public Boolean getChannelIsUsers() {
-        return channelIsUsers;
+    public Boolean getmChannelIsUsers() {
+        return mChannelIsUsers;
     }
 }

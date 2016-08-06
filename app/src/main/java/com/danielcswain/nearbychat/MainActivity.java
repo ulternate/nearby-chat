@@ -87,8 +87,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 //TODO make this point to the correct Channel using the nearby API
                 Intent intent = new Intent(MainActivity.this, ChatActivity.class);
-                intent.putExtra("channelTitle", channelObjects.get(i).getChannelTitle());
-                intent.putExtra("channelTopic", channelObjects.get(i).getChannelTopic());
+                intent.putExtra("channelTitle", channelObjects.get(i).getmChannelTitle());
+                intent.putExtra("channelTopic", channelObjects.get(i).getmChannelTopic());
                 startActivity(intent);
             }
         });
@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public static void unpublishNearbyChannel() {
-        Log.i(TAG, "Unpublishing message: " + ChannelObject.fromNearbyMessage(pubMessage).getChannelTitle());
+        Log.i(TAG, "Unpublishing message: " + ChannelObject.fromNearbyMessage(pubMessage).getmChannelTitle());
         Nearby.Messages.unpublish(sGoogleApiClient, pubMessage);
     }
 
@@ -314,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             for(ChannelObject channelObject : channelObjects){
                 // Only store the channels the user created/owns as the other channels may not be active
                 // when the app is relaunched.
-                if (channelObject.getChannelIsUsers()) {
+                if (channelObject.getmChannelIsUsers()) {
                     String channelJSON = sGson.toJson(channelObject);
                     channels.add(channelJSON);
                 }

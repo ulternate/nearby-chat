@@ -52,11 +52,11 @@ public class ChannelListAdapter extends ArrayAdapter<ChannelObject> {
         ImageView channelPrivateIV = (ImageView) convertView.findViewById(R.id.channel_private_image);
 
         // Set the Channel title and topic based upon the ChannelObject at this position in the List
-        channelTitleTV.setText(channelObject.getChannelTitle());
-        channelTopicTV.setText(channelObject.getChannelTopic());
+        channelTitleTV.setText(channelObject.getmChannelTitle());
+        channelTopicTV.setText(channelObject.getmChannelTopic());
 
         // If the channel is private, show the lock icon to signify that it requires a password
-        if (channelObject.getChannelPrivate()){
+        if (channelObject.getmChannelPrivate()){
             channelPrivateIV.setVisibility(View.VISIBLE);
         } else {
             channelPrivateIV.setVisibility(View.GONE);

@@ -8,6 +8,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -23,7 +24,6 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity{
 
-    private static final String TAG = MainActivity.class.getSimpleName();
     private static final String COLOUR_PICKER_TAG = "Avatar Colour Picker";
     private static final String SHARED_PREFS_FILE = "NearbyChatPreferences";
     public static final String USERNAME_KEY = "username";
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity{
         }
 
         // Set sCurrentAvatarColour to the default colour (currently md_pink_500
-        sCurrentAvatarColour = getResources().getColor(R.color.md_pink_500);
+        sCurrentAvatarColour = ContextCompat.getColor(getApplicationContext(), R.color.md_pink_500);
 
         // Change the sCurrentAvatarColour to the user's previous value if one exists
         if (!avatarColour.isEmpty() && !avatarColour.equals("")){
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity{
                 buttonBackgroundShape.setColor(sCurrentAvatarColour);
             } catch (IllegalArgumentException e){
                 // Otherwise use the default md_pink_500 colour from the resources
-                sCurrentAvatarColour = getResources().getColor(R.color.md_pink_500);
+                sCurrentAvatarColour = ContextCompat.getColor(getApplicationContext(), R.color.md_pink_500);
             }
         }
 

@@ -10,7 +10,6 @@ import android.support.annotation.ColorInt;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -77,9 +76,6 @@ public class MainActivity extends AppCompatActivity{
                 sCurrentAvatarColour = getResources().getColor(R.color.md_pink_500);
             }
         }
-
-        Log.d("currentColour", sCurrentAvatarColour.toString());
-        Log.d("currentColourP", String.valueOf(getResources().getColor(R.color.md_pink_500)));
 
         // Generate a random username when the mGenerateUsernameButton is clicked
         mGenerateUsernameButton.setOnClickListener(new View.OnClickListener() {

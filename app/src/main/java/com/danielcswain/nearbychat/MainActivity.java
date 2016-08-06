@@ -28,7 +28,9 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.messages.Message;
+import com.google.android.gms.nearby.messages.MessageFilter;
 import com.google.android.gms.nearby.messages.MessageListener;
+import com.google.android.gms.nearby.messages.SubscribeOptions;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -274,7 +276,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
      * Show a snackbar to notify of success or failure
      */
     private static void subscribeToNearbyChannels(){
-        Nearby.Messages.subscribe(sGoogleApiClient, sMessageListener)
+        // The filter used to only subscribe to messages with the correct namespace and type.
+        MessageFilter messageFilter = new MessageFilter.Builder()
+                .includeNamespacedType(ChannelObject.channelNamespace, ChannelObject.channelType)
+                .build();
+
+        // Build the subscription options to include the message filter above.
+        SubscribeOptions subscribeOptions = new SubscribeOptions.Builder()
+                .setFilter(messageFilter)
+                .build();
+
+        // Subscribe to nearby messages, assign the messageListener and the subscription options
+        Nearby.Messages.subscribe(sGoogleApiClient, sMessageListener, subscribeOptions)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
@@ -285,6 +298,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         }
                     }
                 });
+
     }
 
     public static void unpublishNearbyChannel() {

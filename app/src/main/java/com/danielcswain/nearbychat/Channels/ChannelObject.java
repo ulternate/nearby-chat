@@ -21,6 +21,8 @@ public class ChannelObject {
     private final Boolean mChannelIsUsers;
     private String mChannelUuid;
     private String mChannelToken;
+    public static final String channelNamespace = "CHANNEL";
+    public static final String channelType = "CHANNEL";
 
     /**
      * Constructor to create a chat channel object
@@ -39,12 +41,12 @@ public class ChannelObject {
     }
 
     public static Message newNearbyMessage(ChannelObject channelObject){
-        return new Message(sGson.toJson(channelObject).getBytes(Charset.forName("UTF-8")), "Channel");
+        return new Message(sGson.toJson(channelObject).getBytes(Charset.forName("UTF-8")), channelNamespace, channelType);
     }
 
     public static Message newNearbyMessage(String channelTitle, String channelTopic, Boolean channelIsUsers){
         ChannelObject channelObject = new ChannelObject(channelTitle, channelTopic, false, channelIsUsers);
-        return new Message(sGson.toJson(channelObject).getBytes(Charset.forName("UTF-8")), "Channel");
+        return new Message(sGson.toJson(channelObject).getBytes(Charset.forName("UTF-8")), channelNamespace, channelType);
     }
 
     public static ChannelObject fromNearbyMessage(Message message){

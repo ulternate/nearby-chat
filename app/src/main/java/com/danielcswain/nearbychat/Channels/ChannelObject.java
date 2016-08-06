@@ -24,7 +24,7 @@ public class ChannelObject {
 
     /**
      * Constructor to create a chat channel object
-     * @param channelTitle the chat channel's title, used to generate a UUID for the channel
+     * @param channelTitle the chat channel's title
      * @param channelTopic the chat channel's topic of discussion
      * @param channelPrivate whether the chat channel is private or not
      */
@@ -35,7 +35,7 @@ public class ChannelObject {
         this.mChannelIsUsers = channelIsUsers;
         //TODO tokenise user's password when channel created.
         this.mChannelToken = "";
-        this.mChannelUuid = UUID.fromString(channelTitle + UUID.randomUUID().toString()).toString();
+        this.mChannelUuid = UUID.randomUUID().toString();
     }
 
     public static Message newNearbyMessage(ChannelObject channelObject){

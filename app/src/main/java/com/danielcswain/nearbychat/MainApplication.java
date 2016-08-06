@@ -44,7 +44,6 @@ public class MainApplication extends Application {
         sActivityTransitionTimerTask = new TimerTask() {
             @Override
             public void run() {
-                Log.d("timer", "Activity transition timer has run");
                 //Set was in background to true
                 wasInBackground = true;
                 // Unpublish and unsubscribe from the nearby channels.
@@ -65,15 +64,11 @@ public class MainApplication extends Application {
      */
     public static void stopActivityTransitionTimer(){
         if (sActivityTransitionTimerTask != null){
-            Log.d("timer", "Activity transition timer cancelled");
             sActivityTransitionTimerTask.cancel();
         }
-
         if (sActivityTransitionTimer != null){
-            Log.d("timer", "Activity transition timer cancelled");
             sActivityTransitionTimer.cancel();
         }
-
         wasInBackground = false;
     }
 

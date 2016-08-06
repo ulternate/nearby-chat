@@ -37,23 +37,23 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    private static GoogleApiClient mGoogleApiClient;
+    private static GoogleApiClient sGoogleApiClient;
     private static final String NEW_CHAT_DIALOG_TAG = NewChatDialogFragment.class.getSimpleName();
     private static final int REQUEST_RESOLVE_ERROR = 1001;
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String SHARED_PREFS_FILE = "NearbyChatPreferences";
     private static final String SHARED_PREFS_CHANNEL_KEY = "channels";
 
-    public static ChannelListAdapter mChannelListAdapter;
+    public static ChannelListAdapter channelListAdapter;
     public static ArrayList<ChannelObject> channelObjects;
-    public static Message mPubMessage;
-    private static View mContainer;
-    private static MessageListener mMessageListener;
-    private static SharedPreferences mSharedPreferences;
-    private static Context mContext;
-    private static final Gson gson = new Gson();
+    public static Message pubMessage;
+    private static View sContainer;
+    private static MessageListener sMessageListener;
+    private static SharedPreferences sSharedPreferences;
+    private static Context sContext;
+    private static final Gson sGson = new Gson();
 
-    protected static MainApplication mApplication;
+    protected static MainApplication sApplication;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,11 +63,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         setSupportActionBar(toolbar);
 
         // Get the application context and the application
-        mContext = getApplicationContext();
-        mApplication = (MainApplication) getApplication();
+        sContext = getApplicationContext();
+        sApplication = (MainApplication) getApplication();
 
         // Get the root view for showing a snackbar
-        mContainer = findViewById(R.id.channel_list);
+        sContainer = findViewById(R.id.channel_list);
 
         // Get the channel list view and layout title text view
         TextView channelListTitle = (TextView) findViewById(R.id.channel_list_title);
@@ -75,11 +75,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         // Initiate the channel ArrayList and ListAdapter
         channelObjects = new ArrayList<>();
-        mChannelListAdapter = new ChannelListAdapter(this, channelObjects);
+        channelListAdapter = new ChannelListAdapter(this, channelObjects);
 
         // Set the channel list title text and the connect the listAdapter to the ListView
         channelListTitle.setText(R.string.channel_list_title_no_channels);
-        channelListView.setAdapter(mChannelListAdapter);
+        channelListView.setAdapter(channelListAdapter);
 
         // Set the listView onListItemClickListener
         channelListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -104,34 +104,34 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
 
         // Build the GoogleApiClient to use the Nearby.Message API
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+        sGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Nearby.MESSAGES_API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
 
         // Message Listener used for the subscription to the NearbyAPI to get the nearby chat channels
-        mMessageListener = new MessageListener() {
+        sMessageListener = new MessageListener() {
             @Override
             public void onFound(final Message message) {
                 // Add the nearby channel to the channel list
-                mChannelListAdapter.add(ChannelObject.fromNearbyMessage(message));
+                channelListAdapter.add(ChannelObject.fromNearbyMessage(message));
             }
 
             @Override
             public void onLost(final Message message) {
                 // Remove the nearby channel from the channel list when it is no longer nearby
-                mChannelListAdapter.remove(ChannelObject.fromNearbyMessage(message));
+                channelListAdapter.remove(ChannelObject.fromNearbyMessage(message));
             }
         };
 
         // Get the shared preferences used for temporarily storing the chat channel information
-        mSharedPreferences = getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE);
+        sSharedPreferences = getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE);
 
         // The following is to only run on the initial launch of the application
         if (MainApplication.firstStart){
             // Clear the sharedPreferences as no channels will be published until user specifies (no chats persist on close)
-            mSharedPreferences.edit().clear().apply();
+            sSharedPreferences.edit().clear().apply();
 
             // Set MainApplication.firstStart to false to stop this block repeating when onCreate is called again without an application relaunch
             MainApplication.setFirstStart(false);
@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onStart() {
         super.onStart();
-        mGoogleApiClient.connect();
+        sGoogleApiClient.connect();
     }
 
     /**
@@ -157,8 +157,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         storeUsersChannelsInSharedPreferences(channelObjects);
         unpublish();
         unsubscribe();
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
+        if (sGoogleApiClient.isConnected()) {
+            sGoogleApiClient.disconnect();
         }
         super.onStop();
     }
@@ -193,10 +193,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         subscribe();
         // Get the Set of channel JSONObject strings from the shared preferences (channels the user had published in
         // this current session).
-        Set<String> channels = mSharedPreferences.getStringSet(SHARED_PREFS_CHANNEL_KEY, new HashSet<String>());
+        Set<String> channels = sSharedPreferences.getStringSet(SHARED_PREFS_CHANNEL_KEY, new HashSet<String>());
         // If the user had published a chat channel in this session then re-publish it and add it back to the chat channel list
         for (String channel: channels){
-            ChannelObject channelObject = gson.fromJson(channel, ChannelObject.class);
+            ChannelObject channelObject = sGson.fromJson(channel, ChannelObject.class);
             publishMessage(ChannelObject.newNearbyMessage(channelObject));
         }
     }
@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_RESOLVE_ERROR) {
             if (resultCode == RESULT_OK) {
-                mGoogleApiClient.connect();
+                sGoogleApiClient.connect();
             } else {
                 Log.e(TAG, "GoogleApiClient connection failed. Unable to resolve.");
             }
@@ -240,21 +240,21 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
      * Show a snackbar to notify of success or failure
      */
     public static void publishMessage(final Message message){
-        Nearby.Messages.publish(mGoogleApiClient, message)
+        Nearby.Messages.publish(sGoogleApiClient, message)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
                         if (status.isSuccess()) {
                             // Add the chat channel to the channel list if it isn't there already
-                            mPubMessage = message;
+                            pubMessage = message;
                             ChannelObject publishedChannel = ChannelObject.fromNearbyMessage(message);
                             if(channelObjects.isEmpty() || !channelObjects.contains(publishedChannel)){
                                 channelObjects.add(publishedChannel);
-                                mChannelListAdapter.notifyDataSetChanged();
-                                showSnackbar(mContext.getString(R.string.nearby_publish_channel_success));
+                                channelListAdapter.notifyDataSetChanged();
+                                showSnackbar(sContext.getString(R.string.nearby_publish_channel_success));
                             }
                         } else {
-                            showSnackbar(mContext.getString(R.string.nearby_publish_channel_failed_status) + status);
+                            showSnackbar(sContext.getString(R.string.nearby_publish_channel_failed_status) + status);
                         }
                     }
                 });
@@ -265,32 +265,32 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
      * Show a snackbar to notify of success or failure
      */
     private void subscribe(){
-        Nearby.Messages.subscribe(mGoogleApiClient, mMessageListener)
+        Nearby.Messages.subscribe(sGoogleApiClient, sMessageListener)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
                         if (status.isSuccess()) {
-                            showSnackbar(mContext.getString(R.string.nearby_subscription_success));
+                            showSnackbar(sContext.getString(R.string.nearby_subscription_success));
                         } else {
-                            showSnackbar(mContext.getString(R.string.nearby_subscription_failed_status) + status);
+                            showSnackbar(sContext.getString(R.string.nearby_subscription_failed_status) + status);
                         }
                     }
                 });
     }
 
     private void unpublish() {
-        Log.i(TAG, "Unpublishing message: " + ChannelObject.fromNearbyMessage(mPubMessage).getChannelTitle());
-        Nearby.Messages.unpublish(mGoogleApiClient, mPubMessage);
+        Log.i(TAG, "Unpublishing message: " + ChannelObject.fromNearbyMessage(pubMessage).getChannelTitle());
+        Nearby.Messages.unpublish(sGoogleApiClient, pubMessage);
     }
 
     private void unsubscribe(){
         Log.i(TAG, "Unsubscribing.");
-        Nearby.Messages.unsubscribe(mGoogleApiClient, mMessageListener);
+        Nearby.Messages.unsubscribe(sGoogleApiClient, sMessageListener);
     }
 
     private static void showSnackbar(String message){
-        if (mContainer != null){
-            Snackbar.make(mContainer, message, Snackbar.LENGTH_SHORT).show();
+        if (sContainer != null){
+            Snackbar.make(sContainer, message, Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -306,12 +306,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 // Only store the channels the user created/owns as the other channels may not be active
                 // when the app is relaunched.
                 if (channelObject.getChannelIsUsers()) {
-                    String channelJSON = gson.toJson(channelObject);
+                    String channelJSON = sGson.toJson(channelObject);
                     channels.add(channelJSON);
                 }
             }
-            // Save to mSharedPreferences
-            mSharedPreferences.edit().putStringSet(SHARED_PREFS_CHANNEL_KEY, channels).apply();
+            // Save to sSharedPreferences
+            sSharedPreferences.edit().putStringSet(SHARED_PREFS_CHANNEL_KEY, channels).apply();
         }
     }
 }

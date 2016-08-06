@@ -1,8 +1,6 @@
 package com.danielcswain.nearbychat;
 
 import android.app.Application;
-import android.util.Log;
-
 import java.util.Timer;
 import java.util.TimerTask;
 

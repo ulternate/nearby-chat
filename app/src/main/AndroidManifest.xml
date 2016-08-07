@@ -9,7 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!-- suppress AndroidDomInspection -->
+        <!--suppress AndroidDomInspection -->
         <meta-data
             android:name="com.google.android.nearby.messages.API_KEY"
             android:value="@string/NEARBY_API_KEY"/>

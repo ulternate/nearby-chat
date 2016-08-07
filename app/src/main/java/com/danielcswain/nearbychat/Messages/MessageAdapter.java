@@ -1,10 +1,13 @@
 package com.danielcswain.nearbychat.Messages;
 
+import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.danielcswain.nearbychat.MainActivity;
 import com.danielcswain.nearbychat.R;
 
 import java.util.ArrayList;
@@ -83,6 +86,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder> {
         // Set the TextViews from the ViewHolder with the appropriate data from the messageObject.
         holder.usernameTV.setText(messageObject.getUsername());
         holder.messageBodyTV.setText(messageObject.getMessageBody());
+
+        // Set the user avatar colour to match the user's chosen colour.
+        try{
+            holder.userAvatarIV.setColorFilter(Color.parseColor(messageObject.getAvatarColour()));
+        } catch (IllegalArgumentException e){
+            // Use the default pink colour if the messageObject.avatarColour property is not a valid Hex String
+            holder.userAvatarIV.setColorFilter(ContextCompat.getColor(MainActivity.mainContext, R.color.md_pink_500));
+        }
 
         // If not the first messageObject then check if the previous messageObject was from the same user.
         // if so, then don't display the user's avatar or username

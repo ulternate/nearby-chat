@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity{
     private static final String SHARED_PREFS_FILE = "NearbyChatPreferences";
     public static final String USERNAME_KEY = "username";
     public static final String AVATAR_COLOUR_KEY = "avatar_colour";
+    public static Context mainContext;
     private SharedPreferences mSharedPreferences;
 
     private EditText mUsernameField;
@@ -43,6 +44,9 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // Get the main context
+        mainContext = getApplicationContext();
 
         // Get the buttons and fields from the view
         mUsernameField = (EditText) findViewById(R.id.username_field);

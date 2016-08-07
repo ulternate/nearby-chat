@@ -9,10 +9,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!--suppress AndroidDomInspection -->
+        <!-- suppress AndroidDomInspection -->
         <meta-data
             android:name="com.google.android.nearby.messages.API_KEY"
-            android:value="@string/NEARBY_API_KEY" />
+            android:value="@string/NEARBY_API_KEY"/>
 
         <activity
             android:name=".MainActivity"
@@ -25,13 +25,14 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".ChatActivity">
+        <activity android:name=".ChatActivity">
+
             <!-- Parent activity meta-data to add back button -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity"/>
         </activity>
+
     </application>
 
 </manifest>

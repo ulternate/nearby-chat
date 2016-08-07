@@ -14,7 +14,6 @@ import java.util.Objects;
 public class MessageObject {
 
     private static final Gson sGson = new Gson();
-    private static final String MESSAGE_NAMESPACE = "NearbyChat";
     private static final String MESSAGE_TYPE = "Message";
 
     private String mUsername;
@@ -30,7 +29,7 @@ public class MessageObject {
     }
 
     public static Message newNearbyMessage(MessageObject messageObject){
-        return new Message(sGson.toJson(messageObject).getBytes(Charset.forName("UTF-8")), MESSAGE_NAMESPACE, MESSAGE_TYPE);
+        return new Message(sGson.toJson(messageObject).getBytes(Charset.forName("UTF-8")), MESSAGE_TYPE);
     }
 
     public static MessageObject fromNearbyMessage(Message message){
@@ -68,5 +67,9 @@ public class MessageObject {
 
     public String getAvatarColour() {
         return mAvatarColour;
+    }
+
+    public void setFromUser(Boolean mFromUser) {
+        this.mFromUser = mFromUser;
     }
 }

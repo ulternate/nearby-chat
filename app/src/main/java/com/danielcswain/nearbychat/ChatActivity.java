@@ -7,6 +7,7 @@ import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,7 +16,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.danielcswain.nearbychat.Messages.MessageAdapter;
 import com.danielcswain.nearbychat.Messages.MessageObject;
@@ -29,14 +29,14 @@ import com.google.android.gms.nearby.messages.MessageListener;
 
 import java.util.ArrayList;
 
-public class ChatActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
+public class ChatActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int REQUEST_RESOLVE_ERROR = 1002;
     private static final String TAG = ChatActivity.class.getSimpleName();
 
-    private GoogleApiClient mGoogleApiClient;
-    private Message mPubMessage;
-    private MessageListener mMessageListener;
+    private static GoogleApiClient mGoogleApiClient;
+    private static Message mPubMessage;
+    private static MessageListener mMessageListener;
 
     private String mUsername;
     private String mAvatarColour;
@@ -44,7 +44,8 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     private ArrayList<MessageObject> mMessageObjects;
     private EditText mTextField;
     private RecyclerView.Adapter mMessageRecyclerAdapter;
-    private RecyclerView mMessagesRecyclerView;
+
+    private View mSnackbarContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,9 +59,12 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         mUsername = intent.getStringExtra(MainActivity.USERNAME_KEY);
         mAvatarColour = intent.getStringExtra(MainActivity.AVATAR_COLOUR_KEY);
 
+        // Get the View for the snackbar
+        mSnackbarContainer = findViewById(R.id.text_entry_container);
+
         // Get a reference to the RecyclerView and set the recycler view to have fixed layout size
         // (as the layout is already full screen)
-        mMessagesRecyclerView = (RecyclerView) findViewById(R.id.messages_list);
+        RecyclerView mMessagesRecyclerView = (RecyclerView) findViewById(R.id.messages_list);
         mMessagesRecyclerView.setHasFixedSize(true);
 
         // Using a stock linear layout manager for the RecyclerView
@@ -77,7 +81,6 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         ImageButton submitButton = (ImageButton) findViewById(R.id.message_send_button);
 
         // Send a new message to the chat when the submit button is clicked
-        // TODO use Nearby API to actually send a message
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -85,7 +88,8 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
                 String messageBody = mTextField.getText().toString();
                 if (!messageBody.isEmpty()){
                     // Publish the message (it will be added to the chat when published successfully)
-                    publishMessage(MessageObject.newNearbyMessage(new MessageObject(mUsername, messageBody, mAvatarColour, true)));
+                    publishMessage(new MessageObject(mUsername, messageBody, mAvatarColour, true));
+
                     // Hide the keyboard and reset the message text field
                     hideSoftKeyboard(ChatActivity.this, view);
                     mTextField.setText("");
@@ -94,25 +98,34 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
+        // Build the GoogleApiClient
+        buildGoogleApiClient();
+
         // Build the Nearby MessageListener
         mMessageListener = new MessageListener() {
             @Override
             public void onFound(Message message) {
                 // Called when a new message is found.
                 Log.d("message Found", "message found: " + MessageObject.fromNearbyMessage(message).getMessageBody());
-                mMessageObjects.add(MessageObject.fromNearbyMessage(message));
-                mMessageRecyclerAdapter.notifyDataSetChanged();
+                MessageObject receivedMessage = MessageObject.fromNearbyMessage(message);
+                // Set the fromUser to false as it wasn't from the currentUser
+                receivedMessage.setFromUser(false);
+                // Add to the RecyclerView
+                mMessageObjects.add(receivedMessage);
+                mMessageRecyclerAdapter.notifyItemInserted(mMessageObjects.size() - 1);
             }
 
             @Override
             public void onLost(final Message message) {
                 // Called when a message is no longer detectable nearby.
-                mMessageObjects.remove(MessageObject.fromNearbyMessage(message));
+                MessageObject lostMessage = MessageObject.fromNearbyMessage(message);
+                // Set the fromUser to false as it wasn't from the currentUser
+                lostMessage.setFromUser(false);
+                // Remove from the RecyclerView
+                mMessageObjects.remove(lostMessage);
                 mMessageRecyclerAdapter.notifyDataSetChanged();
             }
         };
-
-        buildGoogleApiClient();
     }
 
     @Override
@@ -122,6 +135,16 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
             Log.d("disconnected", "wasn't connected");
             mGoogleApiClient.connect();
         }
+    }
+
+    @Override
+    public void onStop() {
+        unpublish();
+        unsubscribe();
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+        super.onStop();
     }
 
     private void buildGoogleApiClient() {
@@ -141,7 +164,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
      */
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d("conntectionFailed", "connection Failed");
+        Log.d("connectionFailed", "connection Failed");
         if (connectionResult.hasResolution()) {
             try {
                 connectionResult.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
@@ -161,8 +184,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        // Subscribe to the channel
-        Log.d("connected", "onConnected");
+        // Subscribe to the chat
         subscribe();
     }
 
@@ -180,40 +202,33 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     private void subscribe(){
-        Log.d("subscribing", "subscribing");
         Nearby.Messages.subscribe(mGoogleApiClient, mMessageListener)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
                         if (status.isSuccess()) {
-                            showToast(getApplicationContext().getString(R.string.nearby_subscription_success));
-                            Log.d("status", String.valueOf(status));
+                            showSnackbar(getApplicationContext().getString(R.string.nearby_subscription_success));
                         } else {
-                            showToast(getApplicationContext().getString(R.string.nearby_subscription_failed_status) + status);
-                            Log.d("status", String.valueOf(status));
+                            showSnackbar(getApplicationContext().getString(R.string.nearby_subscription_failed_status) + status);
                         }
                     }
                 });
     }
 
-    private void publishMessage(final Message message){
-        Log.d("publishing", "publishing");
-        Nearby.Messages.publish(mGoogleApiClient, message)
+    private void publishMessage(final MessageObject messageObject) {
+        Log.i(TAG, "Publishing message: " + messageObject.getMessageBody());
+        mPubMessage = MessageObject.newNearbyMessage(messageObject);
+
+        Nearby.Messages.publish(mGoogleApiClient, mPubMessage)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
-                        if (status.isSuccess()) {
-                            // Add the chat channel to the channel list if it isn't there already
-                            mPubMessage = message;
-                            MessageObject publishedMessageObject = MessageObject.fromNearbyMessage(message);
-                            if (mMessageObjects.isEmpty() || !mMessageObjects.contains(publishedMessageObject)){
-                                mMessageObjects.add(publishedMessageObject);
-                                mMessageRecyclerAdapter.notifyDataSetChanged();
-                            }
-                            Log.d("status", String.valueOf(status));
+                        if (status.isSuccess()){
+                            // Add to channel
+                            mMessageObjects.add(messageObject);
+                            mMessageRecyclerAdapter.notifyItemInserted(mMessageObjects.size() - 1);
                         } else {
-                            showToast(getApplicationContext().getString(R.string.nearby_publish_message_failed_status) + status);
-                            Log.d("status", String.valueOf(status));
+                            showSnackbar(getString(R.string.nearby_publish_message_failed_status) + status);
                         }
                     }
                 });
@@ -234,9 +249,9 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         mInputMethodManager.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
     }
 
-    private void showToast(String message) {
-        if (mMessagesRecyclerView != null){
-            Toast.makeText(ChatActivity.this, message, Toast.LENGTH_SHORT).show();
+    private void showSnackbar(String message){
+        if (mSnackbarContainer != null){
+            Snackbar.make(mSnackbarContainer, message, Snackbar.LENGTH_SHORT).show();
         }
     }
 }

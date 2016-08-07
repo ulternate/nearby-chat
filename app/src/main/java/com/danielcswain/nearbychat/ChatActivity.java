@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -108,8 +109,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         mMessageListener = new MessageListener() {
             @Override
             public void onFound(Message message) {
-                // Called when a new message is found.
-                Log.d("message Found", "message found: " + MessageObject.fromNearbyMessage(message).getMessageBody());
+                // Get the messageObject from the received Nearby Message
                 MessageObject receivedMessage = MessageObject.fromNearbyMessage(message);
                 // Set the fromUser to false as it wasn't from the currentUser
                 receivedMessage.setFromUser(false);
@@ -151,6 +151,30 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onStop();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // If the GoogleApiClient couldn't connect it will prompt the user for permission to use Nearby
+        // using the following request code. Handle this request and connect to the GoogleApiClient if successful
+        if (requestCode == REQUEST_RESOLVE_ERROR) {
+            if (resultCode == RESULT_OK) {
+                mGoogleApiClient.connect();
+            } else {
+                Log.e(TAG, "GoogleApiClient connection failed. Unable to resolve.");
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    /**
+     * Override the default Configuration change handling, this is to stop the activity being recreated on an orientation
+     * change
+     */
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
+
     /**
      * Build the GoogleApiClient to use the Nearby Messages Api
      */
@@ -190,21 +214,6 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onConnected(@Nullable Bundle bundle) {
         // Subscribe to the chat
         subscribe();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // If the GoogleApiClient couldn't connect it will prompt the user for permission to use Nearby
-        // using the following request code. Handle this request and connect to the GoogleApiClient if successful
-        if (requestCode == REQUEST_RESOLVE_ERROR) {
-            if (resultCode == RESULT_OK) {
-                mGoogleApiClient.connect();
-            } else {
-                Log.e(TAG, "GoogleApiClient connection failed. Unable to resolve.");
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 
     /**

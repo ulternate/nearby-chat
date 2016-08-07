@@ -25,7 +25,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ChatActivity">
+        <activity
+            android:name=".ChatActivity"
+            android:configChanges= "orientation|screenLayout|layoutDirection|screenSize">
 
             <!-- Parent activity meta-data to add back button -->
             <meta-data

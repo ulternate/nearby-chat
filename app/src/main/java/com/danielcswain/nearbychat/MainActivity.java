@@ -22,6 +22,9 @@ import com.thebluealliance.spectrum.SpectrumDialog;
 
 import java.util.Random;
 
+/**
+ * Launcher/Main activity for the NearbyChat application.
+ */
 public class MainActivity extends AppCompatActivity{
 
     private static final String COLOUR_PICKER_TAG = "Avatar Colour Picker";
@@ -183,6 +186,9 @@ public class MainActivity extends AppCompatActivity{
                 }).build().show(getSupportFragmentManager(), COLOUR_PICKER_TAG);
     }
 
+    /**
+     * Store the username and avatarColour selections in the SharedPreference file to persist the user's choices.
+     */
     private void storeUsernameAndAvatarColour(String username, String avatarColour){
         // Store the values in the SharedPreferences file
         mSharedPreferences.edit().putString(USERNAME_KEY, username).apply();

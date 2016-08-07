@@ -19,19 +19,36 @@ public class MessageObject {
     private String mUsername;
     private String mMessageBody;
     private String mAvatarColour;
-    private Boolean mFromUser;
+    private boolean mFromUser;
 
-    public MessageObject(String username, String messageBody, String avatarColour, Boolean fromUser){
+    /**
+     * Constructor for initialising a single MessageObject.
+     * @param username the username of the user sending the message
+     * @param messageBody the message text
+     * @param avatarColour the colour of the user's avatar
+     * @param fromUser boolean used to determine which layout to use, either the message_item_received or sent.
+     */
+    public MessageObject(String username, String messageBody, String avatarColour, boolean fromUser){
         this.mUsername = username;
         this.mMessageBody = messageBody;
         this.mAvatarColour = avatarColour;
         this.mFromUser = fromUser;
     }
 
+    /**
+     * Create a Nearby Message using the messageObject
+     * @param messageObject the messageObject being sent
+     * @return a Message with the messageObject as the package (converted to a byte[])
+     */
     public static Message newNearbyMessage(MessageObject messageObject){
         return new Message(sGson.toJson(messageObject).getBytes(Charset.forName("UTF-8")), MESSAGE_TYPE);
     }
 
+    /**
+     * Retrieve a messageObject from the Nearby Message's content
+     * @param message the Nearby Message containing the messageObject as a byte[]
+     * @return a MessageObject using Gson to convert from JSON to an instance of the MessageObject class
+     */
     public static MessageObject fromNearbyMessage(Message message){
         String nearbyMessageString = new String(message.getContent()).trim();
         return sGson.fromJson(
@@ -39,6 +56,10 @@ public class MessageObject {
                 MessageObject.class);
     }
 
+    /**
+     * Custom implementation to test for equality through message content, not if they refer to the same
+     * object in memory. Used by ListAdapter.contains method.
+     */
     @Override
     public boolean equals(Object obj) {
         boolean match = false;
@@ -53,6 +74,9 @@ public class MessageObject {
         return match;
     }
 
+    /**
+     * Get and Set methods for the MessageObject properties
+     */
     public String getUsername() {
         return mUsername;
     }
@@ -61,7 +85,7 @@ public class MessageObject {
         return mMessageBody;
     }
 
-    public Boolean getFromUser() {
+    public boolean getFromUser() {
         return mFromUser;
     }
 
@@ -69,7 +93,7 @@ public class MessageObject {
         return mAvatarColour;
     }
 
-    public void setFromUser(Boolean mFromUser) {
+    public void setFromUser(boolean mFromUser) {
         this.mFromUser = mFromUser;
     }
 }

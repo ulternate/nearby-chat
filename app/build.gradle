@@ -15,20 +15,28 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // Build string resource containing Nearby API Key for release
+            resValue("string", "NEARBY_API_KEY", "\"" + getReleaseApiKey() + "\"")
         }
 
-        // Build string resource containing Nearby API Key
-        applicationVariants.all{ variant ->
-            variant.resValue "string", "NEARBY_API_KEY", "\"" + getAPIKey() + "\""
+        debug{
+            // Build string resource containing Nearby API Key for debugging
+            resValue("string", "NEARBY_API_KEY", "\"" + getDebugApiKey() + "\"")
         }
     }
 }
 
-//Get the Nearby API Key from the gradle.properties file (not checked in)
-def getAPIKey(){
+//Get the Nearby API Key (Debug key) from the gradle.properties file (not checked in)
+def getDebugApiKey(){
     def Properties properties = new Properties()
     properties.load(new FileInputStream(new File('gradle.properties')))
-    return properties['NEARBY_API_KEY']
+    return properties['NEARBY_API_KEY_DEBUG']
+}
+
+def getReleaseApiKey(){
+    def Properties properties = new Properties()
+    properties.load(new FileInputStream(new File('gradle.properties')))
+    return properties['NEARBY_API_KEY_RELEASE']
 }
 
 dependencies {

@@ -29,6 +29,9 @@ import com.google.android.gms.nearby.messages.MessageListener;
 
 import java.util.ArrayList;
 
+/**
+ * Activity using the GoogleApiClient and the Nearby Api to send custom messages to nearby devices.
+ */
 public class ChatActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int REQUEST_RESOLVE_ERROR = 1002;
@@ -131,14 +134,15 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onStart() {
         super.onStart();
+        // Connect to the GoogleApiClient if disconnected
         if (!mGoogleApiClient.isConnected()){
-            Log.d("disconnected", "wasn't connected");
             mGoogleApiClient.connect();
         }
     }
 
     @Override
     public void onStop() {
+        // Unpublish, unsubscribe and disconnect from the GoogleApiClient if connected.
         unpublish();
         unsubscribe();
         if (mGoogleApiClient.isConnected()) {
@@ -147,8 +151,10 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onStop();
     }
 
+    /**
+     * Build the GoogleApiClient to use the Nearby Messages Api
+     */
     private void buildGoogleApiClient() {
-        Log.d("building", "buildign client");
         if (mGoogleApiClient != null) {
             return;
         }
@@ -164,7 +170,6 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
      */
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d("connectionFailed", "connection Failed");
         if (connectionResult.hasResolution()) {
             try {
                 connectionResult.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
@@ -181,7 +186,6 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
 
     }
 
-
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         // Subscribe to the chat
@@ -190,6 +194,8 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // If the GoogleApiClient couldn't connect it will prompt the user for permission to use Nearby
+        // using the following request code. Handle this request and connect to the GoogleApiClient if successful
         if (requestCode == REQUEST_RESOLVE_ERROR) {
             if (resultCode == RESULT_OK) {
                 mGoogleApiClient.connect();
@@ -201,54 +207,73 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
+    /**
+     * Subscribe to the chat and receive nearby messages using the mMessageListener
+     */
     private void subscribe(){
         Nearby.Messages.subscribe(mGoogleApiClient, mMessageListener)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
                         if (status.isSuccess()) {
+                            // Subscribed successfully, notify the user.
                             showSnackbar(getApplicationContext().getString(R.string.nearby_subscription_success));
                         } else {
-                            showSnackbar(getApplicationContext().getString(R.string.nearby_subscription_failed_status) + status);
+                            // Unsuccessfully subscribed, notify the user.
+                            showSnackbar(getApplicationContext().getString(R.string.nearby_subscription_failed));
                         }
                     }
                 });
     }
 
+    /**
+     * Publish the MessageObject to nearby devices.
+     * @param messageObject the messageObject to be published
+     */
     private void publishMessage(final MessageObject messageObject) {
-        Log.i(TAG, "Publishing message: " + messageObject.getMessageBody());
         mPubMessage = MessageObject.newNearbyMessage(messageObject);
-
+        // Publish the message and display in the chat on the device if the publish action was successful
         Nearby.Messages.publish(mGoogleApiClient, mPubMessage)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
                         if (status.isSuccess()){
-                            // Add to channel
+                            // Add to channel as the message was published successfully
                             mMessageObjects.add(messageObject);
                             mMessageRecyclerAdapter.notifyItemInserted(mMessageObjects.size() - 1);
                         } else {
-                            showSnackbar(getString(R.string.nearby_publish_message_failed_status) + status);
+                            // Show a snackbar with a publish failed message
+                            showSnackbar(getString(R.string.nearby_publish_message_failed));
                         }
                     }
                 });
     }
 
+    /**
+     * Unsubscribe and stop listening for nearby messages.
+     */
     private void unsubscribe() {
-        Log.d(TAG, "Unsubscribing.");
         Nearby.Messages.unsubscribe(mGoogleApiClient, mMessageListener);
     }
 
+    /**
+     * Unpublish the message from the chat
+     */
     private void unpublish() {
-        Log.d(TAG, "Unpublishing.");
         Nearby.Messages.unpublish(mGoogleApiClient, mPubMessage);
     }
 
+    /**
+     * Hide the software keyboard from the view
+     */
     public static void hideSoftKeyboard(Activity activity, View view){
         InputMethodManager mInputMethodManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         mInputMethodManager.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
     }
 
+    /**
+     * Show a snackbar with a given message
+     */
     private void showSnackbar(String message){
         if (mSnackbarContainer != null){
             Snackbar.make(mSnackbarContainer, message, Snackbar.LENGTH_SHORT).show();

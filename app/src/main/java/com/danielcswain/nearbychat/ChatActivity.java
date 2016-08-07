@@ -29,7 +29,7 @@ import com.google.android.gms.nearby.messages.MessageListener;
 
 import java.util.ArrayList;
 
-public class ChatActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class ChatActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
     private static final int REQUEST_RESOLVE_ERROR = 1002;
     private static final String TAG = ChatActivity.class.getSimpleName();
@@ -41,11 +41,10 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     private String mUsername;
     private String mAvatarColour;
 
-    ArrayList<MessageObject> mMessageObjects;
-    EditText mTextField;
-    RecyclerView.Adapter mMessageRecyclerAdapter;
-    RecyclerView mMessagesRecyclerView;
-    RecyclerView.LayoutManager mLayoutManager;
+    private ArrayList<MessageObject> mMessageObjects;
+    private EditText mTextField;
+    private RecyclerView.Adapter mMessageRecyclerAdapter;
+    private RecyclerView mMessagesRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +64,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         mMessagesRecyclerView.setHasFixedSize(true);
 
         // Using a stock linear layout manager for the RecyclerView
-        mLayoutManager = new LinearLayoutManager(this);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         mMessagesRecyclerView.setLayoutManager(mLayoutManager);
 
         // Set up the RecyclerView Adapter with the temporary data set and assign it to the RecyclerView
@@ -98,8 +97,9 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         // Build the Nearby MessageListener
         mMessageListener = new MessageListener() {
             @Override
-            public void onFound(final Message message) {
+            public void onFound(Message message) {
                 // Called when a new message is found.
+                Log.d("message Found", "message found: " + MessageObject.fromNearbyMessage(message).getMessageBody());
                 mMessageObjects.add(MessageObject.fromNearbyMessage(message));
                 mMessageRecyclerAdapter.notifyDataSetChanged();
             }
@@ -115,14 +115,24 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         buildGoogleApiClient();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (!mGoogleApiClient.isConnected()){
+            Log.d("disconnected", "wasn't connected");
+            mGoogleApiClient.connect();
+        }
+    }
+
     private void buildGoogleApiClient() {
+        Log.d("building", "buildign client");
         if (mGoogleApiClient != null) {
             return;
         }
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Nearby.MESSAGES_API)
                 .addConnectionCallbacks(this)
-                .enableAutoManage(this, this)
+                .addOnConnectionFailedListener(this)
                 .build();
     }
 
@@ -131,6 +141,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
      */
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d("conntectionFailed", "connection Failed");
         if (connectionResult.hasResolution()) {
             try {
                 connectionResult.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
@@ -151,6 +162,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         // Subscribe to the channel
+        Log.d("connected", "onConnected");
         subscribe();
     }
 
@@ -168,20 +180,24 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     private void subscribe(){
+        Log.d("subscribing", "subscribing");
         Nearby.Messages.subscribe(mGoogleApiClient, mMessageListener)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
                         if (status.isSuccess()) {
                             showToast(getApplicationContext().getString(R.string.nearby_subscription_success));
+                            Log.d("status", String.valueOf(status));
                         } else {
                             showToast(getApplicationContext().getString(R.string.nearby_subscription_failed_status) + status);
+                            Log.d("status", String.valueOf(status));
                         }
                     }
                 });
     }
 
     private void publishMessage(final Message message){
+        Log.d("publishing", "publishing");
         Nearby.Messages.publish(mGoogleApiClient, message)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
@@ -194,8 +210,10 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
                                 mMessageObjects.add(publishedMessageObject);
                                 mMessageRecyclerAdapter.notifyDataSetChanged();
                             }
+                            Log.d("status", String.valueOf(status));
                         } else {
                             showToast(getApplicationContext().getString(R.string.nearby_publish_message_failed_status) + status);
+                            Log.d("status", String.valueOf(status));
                         }
                     }
                 });

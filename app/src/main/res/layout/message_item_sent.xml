@@ -7,9 +7,9 @@
     <ImageView
         android:id="@+id/user_avatar"
         android:layout_alignParentRight="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_avatar_dark"
+        android:layout_width="@dimen/button_message_send_32dp"
+        android:layout_height="@dimen/button_message_send_32dp"
+        android:src="@drawable/ic_avatar_circle_dark"
         />
 
     <TextView
@@ -19,6 +19,7 @@
         android:layout_toLeftOf="@+id/user_avatar"
         android:layout_alignTop="@+id/user_avatar"
         android:layout_alignBottom="@+id/user_avatar"
+        android:layout_marginRight="@dimen/activity_horizontal_margin_4dp"
         android:gravity="center_vertical"
         android:textColor="@android:color/primary_text_light"
         android:textSize="@dimen/text_title"
@@ -34,6 +35,7 @@
         android:layout_marginLeft="@dimen/message_body_alignment_margin"
         android:layout_marginBottom="@dimen/message_bubble_margin"
         android:textColor="@android:color/secondary_text_light"
+        android:textSize="@dimen/text_content"
         android:background="@drawable/bg_message_item_sent"
         />
 

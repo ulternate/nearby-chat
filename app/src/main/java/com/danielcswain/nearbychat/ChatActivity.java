@@ -9,11 +9,15 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -47,9 +51,15 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private ArrayList<MessageObject> mMessageObjects;
     private EditText mTextField;
+    private ImageButton mSubmitButton;
     private RecyclerView.Adapter mMessageRecyclerAdapter;
 
     private View mSnackbarContainer;
+
+    // Animation used to rotate the send button about it's center.
+    private Animation mRotateAnimation = new RotateAnimation(0.0f, 360.0f,
+            Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
+            0.5f);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,16 +92,25 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
 
         // Get the message send views
         mTextField = (EditText) findViewById(R.id.text_entry_field);
-        ImageButton submitButton = (ImageButton) findViewById(R.id.message_send_button);
+        mSubmitButton = (ImageButton) findViewById(R.id.message_send_button);
+
+        // Configure the rotation animation to signify a message is being sent
+        mRotateAnimation.setInterpolator(new LinearInterpolator());
+        mRotateAnimation.setDuration(500);
+        mRotateAnimation.setRepeatCount(Animation.INFINITE);
 
         // Send a new message to the chat when the submit button is clicked
-        submitButton.setOnClickListener(new View.OnClickListener() {
+        mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Get the edit text field's text
                 String messageBody = mTextField.getText().toString();
                 if (!messageBody.isEmpty()){
-                    // Publish the message (it will be added to the chat when published successfully)
+                    // Change the mSubmitbutton drawable to the loop/sync icon and animate it.
+                    mSubmitButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_loop_light));
+                    mSubmitButton.startAnimation(mRotateAnimation);
+
+                    // Publish the message (it will be added to the chat when published successfully and the animation will be stopped)
                     publishMessage(new MessageObject(mUsername, messageBody, mAvatarColour, true));
 
                     // Hide the keyboard and reset the message text field
@@ -258,6 +277,11 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
                             // Show a snackbar with a publish failed message
                             showSnackbar(getString(R.string.nearby_publish_message_failed));
                         }
+                        // Stop the animation regardless of successful publishing or not
+                        mRotateAnimation.cancel();
+                        mRotateAnimation.reset();
+                        // Reset the message button's drawable to the send resource
+                        mSubmitButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.ic_send_light));
                     }
                 });
     }

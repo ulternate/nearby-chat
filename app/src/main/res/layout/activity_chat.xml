@@ -38,16 +38,16 @@
         <EditText
             android:id="@+id/text_entry_field"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/activity_vertical_margin_48dp"
             android:layout_gravity="bottom"
             android:layout_weight="1"/>
 
         <ImageButton
             android:id="@+id/message_send_button"
-            android:layout_width="@dimen/button_message_send_32dp"
-            android:layout_height="@dimen/button_message_send_32dp"
+            android:layout_width="@dimen/button_circular_40dp"
+            android:layout_height="@dimen/button_circular_40dp"
             android:src="@drawable/ic_send_light"
-            android:background="@drawable/bg_button"
+            android:background="@drawable/bg_button_circle"
             android:layout_gravity="center_vertical"/>
     </LinearLayout>
 

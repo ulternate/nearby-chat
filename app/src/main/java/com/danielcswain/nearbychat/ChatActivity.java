@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,9 +22,13 @@ import android.view.animation.RotateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.danielcswain.nearbychat.Messages.MessageAdapter;
 import com.danielcswain.nearbychat.Messages.MessageObject;
+import com.danielcswain.nearbychat.Users.UserObject;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -48,10 +53,12 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private String mUsername;
     private String mAvatarColour;
+    private static UserObject sCurrentUser;
 
     private ArrayList<MessageObject> mMessageObjects;
     private EditText mTextField;
     private ImageButton mSubmitButton;
+    private static LinearLayout mUsersContainer;
     private RecyclerView.Adapter mMessageRecyclerAdapter;
 
     private View mSnackbarContainer;
@@ -72,9 +79,14 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         // Get the username and avatarColour for the user from the calling intent and create a UserObject
         mUsername = intent.getStringExtra(MainActivity.USERNAME_KEY);
         mAvatarColour = intent.getStringExtra(MainActivity.AVATAR_COLOUR_KEY);
+        sCurrentUser = new UserObject(mUsername, mAvatarColour);
 
         // Get the View for the snackbar
         mSnackbarContainer = findViewById(R.id.text_entry_container);
+
+        // Get the view for the current users container
+        mUsersContainer = (LinearLayout) findViewById(R.id.chat_users_container);
+        mUsersContainer.removeAllViews();
 
         // Get a reference to the RecyclerView and set the recycler view to have fixed layout size
         // (as the layout is already full screen)
@@ -130,24 +142,24 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         mMessageListener = new MessageListener() {
             @Override
             public void onFound(Message message) {
-                // Get the messageObject from the received Nearby Message
-                MessageObject receivedMessage = MessageObject.fromNearbyMessage(message);
-                // Set the fromUser to false as it wasn't from the currentUser
-                receivedMessage.setFromUser(false);
-                // Add to the RecyclerView
-                mMessageObjects.add(receivedMessage);
-                mMessageRecyclerAdapter.notifyItemInserted(mMessageObjects.size() - 1);
+                if (message.getType().equals(MessageObject.MESSAGE_TYPE)) {
+                    // If the message has the "Message" type then display the message in the chat
+                    displayMessageOnReceived(message);
+                } else if(message.getType().equals(UserObject.MESSAGE_TYPE)){
+                    // If the message has the "Greeting" type then display
+                    displayGreetingOnReceived(message);
+                }
             }
 
             @Override
-            public void onLost(final Message message) {
-                // Called when a message is no longer detectable nearby.
-                MessageObject lostMessage = MessageObject.fromNearbyMessage(message);
-                // Set the fromUser to false as it wasn't from the currentUser
-                lostMessage.setFromUser(false);
-                // Remove from the RecyclerView
-                mMessageObjects.remove(lostMessage);
-                mMessageRecyclerAdapter.notifyDataSetChanged();
+            public void onLost(Message message) {
+                if (message.getType().equals(MessageObject.MESSAGE_TYPE)) {
+                    // If the message has the "Message" type then remove it if it was lost
+                    removeMessageOnLost(message);
+                } else if (message.getType().equals(UserObject.MESSAGE_TYPE)){
+                    // If the message has the "Greeting" type then remove it if it was lost
+                    removeGreetingOnLost(message);
+                }
             }
         };
     }
@@ -171,6 +183,8 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
+        // Remove the user's from the usersContainer
+        mUsersContainer.removeAllViews();
         super.onStop();
     }
 
@@ -237,6 +251,10 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onConnected(@Nullable Bundle bundle) {
         // Subscribe to the chat
         subscribe();
+        // Say hi, i.e. send a message so other's can see how many users are in the chat
+        if (!sCurrentUser.getUsername().isEmpty() && !sCurrentUser.getUsername().isEmpty()){
+            publishHelloMessage(sCurrentUser);
+        }
     }
 
     /**
@@ -287,6 +305,29 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     /**
+     * Publish a HelloMessage containing the UserObject of the user joining the chat to
+     * enable a count of the current active users in the chat and show the avatar in the usersContainer.
+     * @param userObject the user joining the chat
+     */
+    private void publishHelloMessage(final UserObject userObject){
+        mPubMessage = UserObject.newNearbyMessage(userObject);
+        // Publish the message to the channel and display in the user's bar the user avatar with the avatar colour
+        Nearby.Messages.publish(mGoogleApiClient, mPubMessage)
+                .setResultCallback(new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(@NonNull Status status) {
+                        if (status.isSuccess()){
+                            // Show the user avatar in the chat user window with the user's colour.
+                            addUserToUsersContainer(userObject);
+                        } else {
+                            // Log the error
+                            Log.e(TAG, "Couldn't send the user greeting to the channel: " + status);
+                        }
+                    }
+                });
+    }
+
+    /**
      * Unsubscribe and stop listening for nearby messages.
      */
     private void unsubscribe() {
@@ -301,9 +342,106 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     /**
+     * Display the received message in the chat feed
+     * @param message the message received
+     */
+    private void displayMessageOnReceived(Message message){
+        // Get the messageObject from the received Nearby Message
+        MessageObject receivedMessage = MessageObject.fromNearbyMessage(message);
+        // Set the fromUser to false as it wasn't from the currentUser
+        receivedMessage.setFromUser(false);
+        // Add to the RecyclerView
+        mMessageObjects.add(receivedMessage);
+        mMessageRecyclerAdapter.notifyItemInserted(mMessageObjects.size() - 1);
+    }
+
+    /**
+     * Display the received greeting in the user's present section
+     * @param message the message received, containing the username and avatar colour
+     */
+    private void displayGreetingOnReceived(Message message){
+        // Get the userObject from the received Nearby Message
+        UserObject receivedUser = UserObject.fromNearbyMessage(message);
+        // Show the userObject in the usersContainer
+        addUserToUsersContainer(receivedUser);
+    }
+
+    /**
+     * Remove a lost message from the message feed
+     * @param message the message lost
+     */
+    private void removeMessageOnLost(Message message){
+        // Called when a message is no longer detectable nearby.
+        MessageObject lostMessage = MessageObject.fromNearbyMessage(message);
+        // Set the fromUser to false as it wasn't from the currentUser
+        lostMessage.setFromUser(false);
+        // Remove from the RecyclerView
+        mMessageObjects.remove(lostMessage);
+        mMessageRecyclerAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Remove a lost greeting from the user's present section
+     * @param message the message lost
+     */
+    private void removeGreetingOnLost(Message message){
+        UserObject userObject = UserObject.fromNearbyMessage(message);
+        removeUserFromUsersContainer(userObject);
+    }
+
+    /**
+     * Remove the userIcon referring to the user from the usersContainer
+     * @param userObject the user being removed
+     */
+    private void removeUserFromUsersContainer(UserObject userObject){
+        // Loop through the userIcons in the UsersContainer to find the user that was lost
+        for (int i = 0; i < mUsersContainer.getChildCount(); i++) {
+            // Remove the corresponding userIcon if it exists with the same username as the content description and avatarColour
+            ImageView userIcon = (ImageView) mUsersContainer.getChildAt(i);
+            if (userIcon.getContentDescription().equals(userObject.getUsername())){
+                mUsersContainer.removeView(userIcon);
+            }
+        }
+    }
+
+    /**
+     * Add a userIcon to the User container to show who's in the chat currently
+     * @param userObject the UserObject representing the user that has just joined the chat
+     */
+    private void addUserToUsersContainer(UserObject userObject){
+        // Create an ImageView to add to the LinearLayout
+        ImageView userIcon = new ImageView(getApplicationContext());
+
+        // Set the drawable for the ImageView
+        userIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_avatar_circle_dark));
+
+        // Use LayoutParams to set the height and width of the image.
+        int iconDimens = (int) getResources().getDimension(R.dimen.button_message_send_32dp);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(iconDimens, iconDimens);
+
+        // Set the colour of the avatar
+        userIcon.setColorFilter(Color.parseColor(userObject.getAvatarColour()));
+
+        // Add onClickListener to image
+        final String username = userObject.getUsername();
+        userIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(ChatActivity.this, username, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Set the content description label (used to identify the userIcon for removal and accessibility)
+        userIcon.setContentDescription(userObject.getUsername());
+
+        // Add the new userIcon to the view with the layout params
+        mUsersContainer.addView(userIcon, layoutParams);
+    }
+
+    /**
      * Hide the software keyboard from the view
      */
-    public static void hideSoftKeyboard(Activity activity, View view){
+    private static void hideSoftKeyboard(Activity activity, View view){
         InputMethodManager mInputMethodManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         mInputMethodManager.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
     }

@@ -13,9 +13,9 @@ import java.util.Objects;
  */
 public class MessageObject {
 
-    private static final Gson sGson = new Gson();
-    private static final String MESSAGE_TYPE = "Message";
+    public static final String MESSAGE_TYPE = "Message";
 
+    private static final Gson sGson = new Gson();
     private String mUsername;
     private String mMessageBody;
     private String mAvatarColour;

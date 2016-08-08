@@ -8,6 +8,7 @@
     <color name="messageReceived">#0d47a1</color>
     <color name="messageSent">#cfd8dc</color>
     <color name="messageTextField">#EEEEEE</color>
+    <color name="messageUsersField">#e0e0e0</color>
     <color name="textLight">#ffffff</color>
     <color name="textDark">#212121</color>
 

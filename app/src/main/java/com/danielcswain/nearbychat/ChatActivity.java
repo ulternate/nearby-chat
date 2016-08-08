@@ -21,6 +21,7 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -422,7 +423,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         // Set the colour of the avatar
         userIcon.setColorFilter(Color.parseColor(userObject.getAvatarColour()));
 
-        // Add onClickListener to image
+        // Add onClickListener to image to show the username of the user being clicked on
         final String username = userObject.getUsername();
         userIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -436,6 +437,10 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
 
         // Add the new userIcon to the view with the layout params
         mUsersContainer.addView(userIcon, layoutParams);
+
+        // Now there's a userIcon in the Users container, set the parent view background color
+        HorizontalScrollView horizontalScrollView = (HorizontalScrollView) mUsersContainer.getParent();
+        horizontalScrollView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.messageUsersField));
     }
 
     /**

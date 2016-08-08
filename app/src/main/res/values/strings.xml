@@ -5,11 +5,14 @@
     <string name="nearby_publish_message_failed">Could not publish message.</string>
     <string name="nearby_subscription_failed">Could not subscribe to chat.</string>
     <string name="username">Username</string>
+    <string name="username_generate_button_description">Generate Username</string>
     <string name="action_enter_chat">Enter Chat</string>
     <string name="select_avatar_colour">Select Avatar Colour</string>
     <string name="welcome_message">Chat with people nearby you.</string>
     <string name="error_empty_username">Please enter or generate a username before joining the chat</string>
     <string name="error_empty_message">Please enter a message and try again</string>
+    <string name="message_text_entry_field_hint">Send a message to the chat</string>
+    <string name="message_send_button_description">Send Message</string>
 
     <string-array name="animals">
         <item>Armadillo</item>

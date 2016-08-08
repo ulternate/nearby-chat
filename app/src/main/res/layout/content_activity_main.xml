@@ -28,6 +28,7 @@
         android:id="@+id/username_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:inputType="textCapWords"
         android:hint="@string/username"
         android:layout_toLeftOf="@+id/button_username_generate"
         android:layout_above="@+id/avatar_colour_title"
@@ -46,6 +47,7 @@
         android:layout_marginRight="@dimen/activity_horizontal_margin_32dp"
         android:src="@drawable/ic_loop_light"
         android:background="@drawable/bg_button_circle"
+        android:contentDescription="@string/username_generate_button_description"
         />
 
     <TextView
@@ -68,6 +70,7 @@
         android:layout_marginRight="@dimen/activity_horizontal_margin_32dp"
         android:src="@drawable/ic_avatar_circle_light"
         android:background="@drawable/bg_button_circle_colour_picker"
+        android:contentDescription="@string/select_avatar_colour"
         />
 
     <Button

@@ -98,6 +98,8 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
                     hideSoftKeyboard(ChatActivity.this, view);
                     mTextField.setText("");
                     mTextField.clearFocus();
+                } else {
+                    showSnackbar(getString(R.string.error_empty_message));
                 }
             }
         });

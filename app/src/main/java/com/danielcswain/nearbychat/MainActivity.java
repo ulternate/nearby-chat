@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity{
         // Set the username field if the user had saved one previously
         if (!username.isEmpty() && !username.equals("")){
             mUsernameField.setText(username);
+            mUsernameField.setSelection(mUsernameField.getText().length());
         }
 
         // Set sCurrentAvatarColour to the default colour (currently md_pink_500

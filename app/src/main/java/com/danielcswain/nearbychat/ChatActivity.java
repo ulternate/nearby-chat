@@ -143,7 +143,9 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onStop() {
         // Unpublish, unsubscribe and disconnect from the GoogleApiClient if connected.
-        unpublish();
+        if (mPubMessage != null) {
+            unpublish();
+        }
         unsubscribe();
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();

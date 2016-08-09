@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_view"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/user_avatar"
+        android:layout_width="@dimen/button_message_send_32dp"
+        android:layout_height="@dimen/button_message_send_32dp"
+        android:src="@drawable/ic_avatar_circle_dark"
+        />
+
+</RelativeLayout>

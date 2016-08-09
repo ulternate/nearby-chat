@@ -21,6 +21,7 @@ import android.view.animation.RotateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 
 import com.danielcswain.nearbychat.Messages.MessageAdapter;
 import com.danielcswain.nearbychat.Messages.MessageObject;
@@ -33,6 +34,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.messages.Message;
 import com.google.android.gms.nearby.messages.MessageListener;
+import com.tomergoldst.tooltips.ToolTipsManager;
 
 import java.util.ArrayList;
 
@@ -59,7 +61,9 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     private RecyclerView.Adapter mMessageRecyclerAdapter;
     private static RecyclerView.Adapter mUserRecyclerAdapter;
 
-    private View mSnackbarContainer;
+    public static RelativeLayout mRootContainer;
+
+    public static ToolTipsManager toolTipsManager;
 
     // Animation used to rotate the send button about it's center.
     private Animation mRotateAnimation = new RotateAnimation(0.0f, 360.0f,
@@ -80,7 +84,10 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         sCurrentUser = new UserObject(mUsername, mAvatarColour);
 
         // Get the View for the snackbar
-        mSnackbarContainer = findViewById(R.id.text_entry_container);
+        mRootContainer = (RelativeLayout) findViewById(R.id.root_view);
+
+        // Initiate the Tooltips manager
+        toolTipsManager = new ToolTipsManager();
 
         // Set up the users views and adapters
         setUpUsersViews();
@@ -443,8 +450,8 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
      * Show a snackbar with a given message
      */
     private void showSnackbar(String message){
-        if (mSnackbarContainer != null){
-            Snackbar.make(mSnackbarContainer, message, Snackbar.LENGTH_SHORT).show();
+        if (mRootContainer != null){
+            Snackbar.make(mRootContainer, message, Snackbar.LENGTH_SHORT).show();
         }
     }
 }

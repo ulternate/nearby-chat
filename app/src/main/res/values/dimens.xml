@@ -5,12 +5,15 @@
     <dimen name="activity_vertical_margin_8dp">8dp</dimen>
     <dimen name="activity_horizontal_margin_16dp">16dp</dimen>
     <dimen name="activity_vertical_margin_16dp">16dp</dimen>
+    <dimen name="activity_horizontal_margin_24dp">24dp</dimen>
+    <dimen name="activity_vertical_margin_24dp">24dp</dimen>
     <dimen name="activity_horizontal_margin_32dp">32dp</dimen>
     <dimen name="activity_vertical_margin_32dp">32dp</dimen>
     <dimen name="activity_horizontal_margin_48dp">48dp</dimen>
     <dimen name="activity_vertical_margin_48dp">48dp</dimen>
     <dimen name="text_title">18sp</dimen>
     <dimen name="text_content">16sp</dimen>
+    <dimen name="tooltip_left_spacing">-6dp</dimen>
     <dimen name="message_bubble_padding">8dp</dimen>
     <dimen name="message_bubble_margin">4dp</dimen>
     <dimen name="message_body_alignment_margin">110dp</dimen>

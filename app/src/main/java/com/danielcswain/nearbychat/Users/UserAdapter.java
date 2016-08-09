@@ -1,14 +1,19 @@
 package com.danielcswain.nearbychat.Users;
 
 import android.graphics.Color;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.danielcswain.nearbychat.ChatActivity;
 import com.danielcswain.nearbychat.MainActivity;
 import com.danielcswain.nearbychat.R;
+import com.tomergoldst.tooltips.ToolTip;
 
 import java.util.ArrayList;
 
@@ -23,6 +28,7 @@ import java.util.ArrayList;
 public class UserAdapter extends RecyclerView.Adapter<UserViewHolder> {
 
     private ArrayList<UserObject> mUserObjects;
+    private final long DELAY = 2000;
 
     /**
      * Constructor for the UserAdapter
@@ -54,7 +60,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserViewHolder> {
      * @param position the position of the item in the RecyclerView.Adapters data set.
      */
     @Override
-    public void onBindViewHolder(UserViewHolder holder, int position) {
+    public void onBindViewHolder(final UserViewHolder holder, int position) {
         // Get the userObject from the ArrayList at that position
         final UserObject userObject = mUserObjects.get(position);
 
@@ -65,9 +71,42 @@ public class UserAdapter extends RecyclerView.Adapter<UserViewHolder> {
         holder.userAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.mainContext, userObject.getUsername(), Toast.LENGTH_SHORT).show();
+                if (ChatActivity.toolTipsManager != null) {
+                    // There's a ToolTips manager so build and show the toolTip on click of the userAvatar
+                    // First, dismiss any current ToolTips
+                    ChatActivity.toolTipsManager.findAndDismiss(holder.toolTipTarget);
+                    buildAndShowToolTip(holder, userObject);
+                } else {
+                    // Show a Toast if there's no ToolTips Manager
+                    Toast.makeText(MainActivity.mainContext, userObject.getUsername(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
+    }
+
+    private void buildAndShowToolTip(final UserViewHolder holder, UserObject userObject){
+        // Build the ToolTip containing the username
+        ToolTip.Builder builder = new ToolTip.Builder(MainActivity.mainContext,
+                holder.toolTipTarget,
+                ChatActivity.mRootContainer,
+                userObject.getUsername(),
+                ToolTip.POSITION_BELOW);
+        // Set the alignment of the ToolTip
+        builder.setAlign(ToolTip.ALIGN_LEFT);
+        // Set the background colour and text to match the user's avatar
+        builder.setBackgroundColor(Color.parseColor(userObject.getAvatarColour()));
+        builder.setTextColor(ContextCompat.getColor(MainActivity.mainContext, R.color.md_white));
+        // Show the ToolTip
+        ChatActivity.toolTipsManager.show(builder.build());
+        // Dismiss the ToolTip after a short delay
+        Handler dismissToolTipHandler = new Handler(Looper.getMainLooper());
+        Runnable dismissToolTipRunnable = new Runnable() {
+            @Override
+            public void run() {
+                ChatActivity.toolTipsManager.findAndDismiss(holder.toolTipTarget);
+            }
+        };
+        dismissToolTipHandler.postDelayed(dismissToolTipRunnable, DELAY);
     }
 
     /**

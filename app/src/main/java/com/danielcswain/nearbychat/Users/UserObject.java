@@ -4,6 +4,7 @@ import com.google.android.gms.nearby.messages.Message;
 import com.google.gson.Gson;
 
 import java.nio.charset.Charset;
+import java.util.Objects;
 
 /**
  * Created by ulternate on 8/08/2016.
@@ -47,6 +48,22 @@ public class UserObject {
         return sGson.fromJson(
                 (new String(nearbyMessageString.getBytes(Charset.forName("UTF-8")))),
                 UserObject.class);
+    }
+
+    /**
+     * Custom implementation to test for equality through user object content, not if they refer to the same
+     * object in memory. Used by Adapter and ArrayList methods.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        boolean match = false;
+        if (obj != null && obj instanceof UserObject){
+            if (Objects.equals(((UserObject) obj).mUsername, this.mUsername) &&
+                    Objects.equals(((UserObject) obj).mAvatarColour, this.mAvatarColour)){
+                match = true;
+            }
+        }
+        return match;
     }
 
     public String getUsername() {

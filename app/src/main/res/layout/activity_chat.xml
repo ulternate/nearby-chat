@@ -7,28 +7,20 @@
     android:background="@color/messageTextField"
     tools:context="com.danielcswain.nearbychat.ChatActivity">
 
-    <HorizontalScrollView
-        android:id="@+id/chat_users_scoll_view"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/users_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="@dimen/activity_vertical_margin_8dp"
         android:orientation="horizontal"
-        android:scrollbars="none">
-
-        <LinearLayout
-            android:id="@+id/chat_users_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/activity_horizontal_margin_8dp"
-            />
-
-    </HorizontalScrollView>
+        android:scrollbars="none"
+        />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/messages_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/chat_users_scoll_view"
+        android:layout_below="@+id/users_list"
         android:layout_marginTop="@dimen/activity_vertical_margin_8dp"
         android:scrollbars="none"
         android:layout_above="@+id/text_entry_container"

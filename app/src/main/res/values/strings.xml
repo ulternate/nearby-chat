@@ -13,6 +13,9 @@
     <string name="error_empty_message">Please enter a message and try again</string>
     <string name="message_text_entry_field_hint">Send a message to the chat</string>
     <string name="message_send_button_description">Send Message</string>
+    <string name="message_avatar_sent_description">Your Avatar</string>
+    <string name="message_avatar_received_description">Sender\'s Avatar</string>
+    <string name="user_avatar_content_description">User\'s Avatar</string>
 
     <string-array name="animals">
         <item>Armadillo</item>

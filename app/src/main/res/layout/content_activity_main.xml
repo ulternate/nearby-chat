@@ -10,6 +10,7 @@
     tools:context="com.danielcswain.nearbychat.MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <!--Welcome text-->
     <TextView
         android:id="@+id/welcome_message"
         android:layout_width="wrap_content"
@@ -21,6 +22,7 @@
         android:layout_marginBottom="@dimen/activity_vertical_margin_48dp"
         />
 
+    <!--UserName entry field-->
     <EditText
         android:id="@+id/username_field"
         android:layout_width="match_parent"
@@ -34,6 +36,7 @@
         android:layout_marginRight="8dp"
         />
 
+    <!--Button to generate a random username-->
     <ImageButton
         android:id="@+id/button_username_generate"
         android:layout_width="@dimen/button_circular_40dp"
@@ -47,6 +50,7 @@
         android:contentDescription="@string/username_generate_button_description"
         />
 
+    <!--Title for the avatar colour picker-->
     <TextView
         android:id="@+id/avatar_colour_title"
         android:layout_width="wrap_content"
@@ -58,6 +62,7 @@
         android:textSize="@dimen/text_title"
         />
 
+    <!--Button to pick the avatar colour to be used in the chat-->
     <ImageButton
         android:id="@+id/button_avatar_colour_picker"
         android:layout_width="@dimen/button_circular_40dp"
@@ -70,6 +75,7 @@
         android:contentDescription="@string/select_avatar_colour"
         />
 
+    <!--Button to enter the chat, and start the Nearby API-->
     <Button
         android:id="@+id/button_enter_chat"
         android:layout_width="wrap_content"

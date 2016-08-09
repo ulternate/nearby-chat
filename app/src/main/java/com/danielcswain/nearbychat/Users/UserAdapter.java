@@ -28,7 +28,6 @@ import java.util.ArrayList;
 public class UserAdapter extends RecyclerView.Adapter<UserViewHolder> {
 
     private ArrayList<UserObject> mUserObjects;
-    private final long DELAY = 2000;
 
     /**
      * Constructor for the UserAdapter
@@ -84,6 +83,12 @@ public class UserAdapter extends RecyclerView.Adapter<UserViewHolder> {
         });
     }
 
+    /**
+     * Build and show the ToolTip when the userAvatar in the view holder is clicked.
+     * This will auto dismiss after the DELAY set above.
+     * @param holder the UserViewHolder containing the userAvatar image and the tooltip anchor
+     * @param userObject the UserObject relating to the clicked userAvatar image.
+     */
     private void buildAndShowToolTip(final UserViewHolder holder, UserObject userObject){
         // Build the ToolTip containing the username
         ToolTip.Builder builder = new ToolTip.Builder(MainActivity.mainContext,
@@ -106,7 +111,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserViewHolder> {
                 ChatActivity.toolTipsManager.findAndDismiss(holder.toolTipTarget);
             }
         };
-        dismissToolTipHandler.postDelayed(dismissToolTipRunnable, DELAY);
+        dismissToolTipHandler.postDelayed(dismissToolTipRunnable, 2000);
     }
 
     /**

@@ -4,14 +4,19 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
+    <!--The image of the user's avatar-->
     <ImageView
         android:id="@+id/user_avatar"
         android:layout_width="@dimen/button_message_send_32dp"
         android:layout_height="@dimen/button_message_send_32dp"
         android:src="@drawable/ic_avatar_circle_dark"
         android:layout_centerInParent="true"
+        android:contentDescription="@string/user_avatar_content_description"
         />
 
+    <!--The anchor view for the tooltip, this contains no content
+        but the toolTip will position itself below this view in
+        the RootView set in the ToolTip.Builder-->
     <TextView
         android:id="@+id/user_avatar_tooltip_target"
         android:layout_width="@dimen/activity_horizontal_margin_8dp"

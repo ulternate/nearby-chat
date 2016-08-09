@@ -8,6 +8,7 @@
     android:background="@color/messageTextField"
     tools:context="com.danielcswain.nearbychat.ChatActivity">
 
+    <!--The RecyclerView containing the user's currently in the chat-->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/users_list"
         android:layout_width="match_parent"
@@ -17,6 +18,7 @@
         android:scrollbars="none"
         />
 
+    <!--The RecyclerView containing all the messages sent in the chat-->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/messages_list"
         android:layout_width="match_parent"
@@ -27,6 +29,7 @@
         android:layout_above="@+id/text_entry_container"
         />
 
+    <!--The Message entry field layout-->
     <LinearLayout
         android:id="@+id/text_entry_container"
         android:layout_width="match_parent"
@@ -36,6 +39,7 @@
         android:background="@color/md_white"
         android:orientation="horizontal">
 
+        <!--Message Text Entry field-->
         <EditText
             android:id="@+id/text_entry_field"
             android:layout_width="0dp"
@@ -48,6 +52,7 @@
             android:hint="@string/message_text_entry_field_hint"
             />
 
+        <!--Message Send Button-->
         <ImageButton
             android:id="@+id/message_send_button"
             android:layout_width="@dimen/button_circular_40dp"

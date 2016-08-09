@@ -1,5 +1,6 @@
 package com.danielcswain.nearbychat;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -91,6 +93,8 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(View view) {
                 mUsernameField.setText(generateUsername());
                 mUsernameField.setSelection(mUsernameField.getText().length());
+                // Hide the soft keyboard if it was up
+                hideSoftKeyboard(MainActivity.this, view);
             }
         });
 
@@ -99,6 +103,8 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
                 launchColourPickerDialog(sCurrentAvatarColour);
+                // Hide the soft keyboard if it was up
+                hideSoftKeyboard(MainActivity.this, view);
             }
         });
 
@@ -185,6 +191,14 @@ public class MainActivity extends AppCompatActivity{
                         }
                     }
                 }).build().show(getSupportFragmentManager(), COLOUR_PICKER_TAG);
+    }
+
+    /**
+     * Hide the software keyboard from the view
+     */
+    private static void hideSoftKeyboard(Activity activity, View view){
+        InputMethodManager mInputMethodManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        mInputMethodManager.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
     }
 
     /**

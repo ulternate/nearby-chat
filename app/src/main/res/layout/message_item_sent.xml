@@ -42,6 +42,7 @@
         android:layout_marginBottom="@dimen/message_bubble_margin"
         android:textColor="@android:color/secondary_text_light"
         android:textSize="@dimen/text_content"
+        android:autoLink="all"
         android:background="@drawable/bg_message_item_sent"
         />
 

@@ -1,6 +1,7 @@
 package com.danielcswain.nearbychat;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -24,6 +25,7 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 
 import com.danielcswain.nearbychat.Messages.MessageAdapter;
+import com.danielcswain.nearbychat.Messages.MessageDialog;
 import com.danielcswain.nearbychat.Messages.MessageObject;
 import com.danielcswain.nearbychat.Users.UserAdapter;
 import com.danielcswain.nearbychat.Users.UserObject;
@@ -45,6 +47,9 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private static final int REQUEST_RESOLVE_ERROR = 1002;
     private static final String TAG = ChatActivity.class.getSimpleName();
+    public static final String DIALOG_COUNTER_KEY = "dialog_counter";
+    public static final String DIALOG_DISMISSED_KEY = "dialog_dismissed";
+    private static final String DIALOG_FRAGMENT_TAG = "Dialog Fragment";
 
     private static GoogleApiClient mGoogleApiClient;
     private static Message mPubMessage;
@@ -103,6 +108,9 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
 
         // Build the Nearby MessageListener
         buildMessageListener();
+
+        // Check if the MessageDialog needs to be shown
+        checkAndShowMessageDialog();
     }
 
     @Override
@@ -303,6 +311,22 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
                 }
             }
         };
+    }
+
+    /**
+     * Check if the user hasn't permanently dismissed the Message Info dialog, if not then show it
+     */
+    private void checkAndShowMessageDialog() {
+        // Get the amount of times the dialog has been dismissed and if it has been tagged as being permanently dismissed.
+        int counter = MainActivity.sharedPreferences.getInt(DIALOG_COUNTER_KEY, 1);
+        boolean dismissed = MainActivity.sharedPreferences.getBoolean(DIALOG_DISMISSED_KEY, false);
+
+        // Only show the dialog if the user hasn't permanently dismissed it or the counter is less than 5.
+        if (counter < 5 && !dismissed){
+            DialogFragment mDialog = new MessageDialog();
+            mDialog.show(getFragmentManager(), DIALOG_FRAGMENT_TAG);
+        }
+
     }
 
     /**

@@ -30,11 +30,11 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity{
 
     private static final String COLOUR_PICKER_TAG = "Avatar Colour Picker";
-    private static final String SHARED_PREFS_FILE = "NearbyChatPreferences";
+    public static final String SHARED_PREFS_FILE = "NearbyChatPreferences";
     public static final String USERNAME_KEY = "username";
     public static final String AVATAR_COLOUR_KEY = "avatar_colour";
     public static Context mainContext;
-    private SharedPreferences mSharedPreferences;
+    public static SharedPreferences sharedPreferences;
 
     private EditText mUsernameField;
     private ImageButton mGenerateUsernameButton;
@@ -60,9 +60,9 @@ public class MainActivity extends AppCompatActivity{
         mEnterChatButton = (Button) findViewById(R.id.button_enter_chat);
 
         // Get any saved username and avatar colour from the shared preference file
-        mSharedPreferences = getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE);
-        String username = mSharedPreferences.getString(USERNAME_KEY, "");
-        String avatarColour = mSharedPreferences.getString(AVATAR_COLOUR_KEY, "");
+        sharedPreferences = getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE);
+        String username = sharedPreferences.getString(USERNAME_KEY, "");
+        String avatarColour = sharedPreferences.getString(AVATAR_COLOUR_KEY, "");
 
         // Set the username field if the user had saved one previously
         if (!username.isEmpty() && !username.equals("")){
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity{
      */
     private void storeUsernameAndAvatarColour(String username, String avatarColour){
         // Store the values in the SharedPreferences file
-        mSharedPreferences.edit().putString(USERNAME_KEY, username).apply();
-        mSharedPreferences.edit().putString(AVATAR_COLOUR_KEY, avatarColour).apply();
+        sharedPreferences.edit().putString(USERNAME_KEY, username).apply();
+        sharedPreferences.edit().putString(AVATAR_COLOUR_KEY, avatarColour).apply();
     }
 }

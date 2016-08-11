@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 
 import java.nio.charset.Charset;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Created by ulternate on 3/08/2016.
@@ -20,6 +21,7 @@ public class MessageObject {
     private String mMessageBody;
     private String mAvatarColour;
     private boolean mFromUser;
+    private UUID mMessageUuid;
 
     /**
      * Constructor for initialising a single MessageObject.
@@ -33,6 +35,7 @@ public class MessageObject {
         this.mMessageBody = messageBody;
         this.mAvatarColour = avatarColour;
         this.mFromUser = fromUser;
+        this.mMessageUuid = UUID.randomUUID();
     }
 
     /**
@@ -67,7 +70,8 @@ public class MessageObject {
             if (Objects.equals(((MessageObject) obj).mUsername, this.mUsername) &&
                     Objects.equals(((MessageObject) obj).mMessageBody, this.mMessageBody) &&
                     Objects.equals(((MessageObject) obj).mAvatarColour, this.mAvatarColour) &&
-                    Objects.equals(((MessageObject) obj).mFromUser, this.mFromUser)){
+                    Objects.equals(((MessageObject) obj).mFromUser, this.mFromUser) &&
+                    Objects.equals(((MessageObject) obj).mMessageUuid, this.mMessageUuid)){
                 match = true;
             }
         }
@@ -91,6 +95,10 @@ public class MessageObject {
 
     public String getAvatarColour() {
         return mAvatarColour;
+    }
+
+    public UUID getMessageUuid() {
+        return mMessageUuid;
     }
 
     public void setFromUser(boolean mFromUser) {

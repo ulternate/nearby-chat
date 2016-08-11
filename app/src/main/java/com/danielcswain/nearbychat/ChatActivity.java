@@ -421,9 +421,12 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         MessageObject receivedMessage = MessageObject.fromNearbyMessage(message);
         // Set the fromUser to the passed boolean
         receivedMessage.setFromUser(fromUser);
-        // Add to the RecyclerView
-        mMessageObjects.add(receivedMessage);
-        mMessageRecyclerAdapter.notifyItemInserted(mMessageObjects.size() - 1);
+        // Add to the RecyclerView if it doesn't already exist (i.e. the user has left and come back quickly
+        // without stopping the activity)
+        if (!mMessageObjects.contains(receivedMessage)) {
+            mMessageObjects.add(receivedMessage);
+            mMessageRecyclerAdapter.notifyItemInserted(mMessageObjects.size() - 1);
+        }
     }
 
     /**

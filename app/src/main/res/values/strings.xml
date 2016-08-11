@@ -16,7 +16,6 @@
     <string name="message_avatar_sent_description">Your Avatar</string>
     <string name="message_avatar_received_description">Sender\'s Avatar</string>
     <string name="user_avatar_content_description">User\'s Avatar</string>
-    <string name="dialog_messages_ephemeral_title">Welcome to the chat</string>
     <string name="dialog_messages_ephemeral_positive_action">OK</string>
     <string name="dialog_messages_ephemeral_body">The messages you send in this chat aren\'t persistent and will disappear shortly after you leave the app, or turn off your screen</string>
     <string name="dialog_messages_ephemeral_negative_action">Don\'t Show Again</string>

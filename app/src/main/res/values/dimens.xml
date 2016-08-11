@@ -19,4 +19,5 @@
     <dimen name="message_body_alignment_margin">110dp</dimen>
     <dimen name="button_circular_40dp">40dp</dimen>
     <dimen name="button_message_send_32dp">32dp</dimen>
+    <dimen name="text_emoji">28sp</dimen>
 </resources>

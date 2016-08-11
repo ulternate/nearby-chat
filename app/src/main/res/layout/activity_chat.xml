@@ -2,6 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:emojicon="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -39,8 +40,18 @@
         android:background="@color/md_white"
         android:orientation="horizontal">
 
-        <!--Message Text Entry field-->
-        <EditText
+        <!--Button to launch the SuperNova-Emoji keyboard-->
+        <ImageView
+            android:id="@+id/text_emoji_button"
+            android:layout_width="@dimen/button_circular_40dp"
+            android:layout_height="@dimen/button_circular_40dp"
+            android:src="@drawable/ic_insert_emoticon_grey"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/message_emoji_button_description"
+            />
+
+        <!--Message Text Entry field (supports Emoji via SuperNova-Emoji library-->
+        <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
             android:id="@+id/text_entry_field"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -50,6 +61,7 @@
             android:maxLines="4"
             android:gravity="top|left"
             android:hint="@string/message_text_entry_field_hint"
+            emojicon:emojiconSize="@dimen/text_emoji"
             />
 
         <!--Message Send Button-->

@@ -26,6 +26,11 @@ android {
     }
 }
 
+// Repository for Supernova-Emoji library
+repositories {
+    maven { url "https://dl.bintray.com/hani-momanii/maven"}
+}
+
 //Get the Nearby API Key (Debug key) from the gradle.properties file (not checked in)
 def getDebugApiKey(){
     def Properties properties = new Properties()
@@ -48,5 +53,6 @@ dependencies {
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.thebluealliance:spectrum:0.5.0'
     compile 'com.tomergoldst.android:tooltips:1.0.2'
-    compile 'com.google.android.gms:play-services-nearby:9.2.1'
+    compile 'hani.momanii.supernova_emoji_library:supernova-emoji-library:0.0.2'
+    compile 'com.google.android.gms:play-services-nearby:9.4.0'
 }

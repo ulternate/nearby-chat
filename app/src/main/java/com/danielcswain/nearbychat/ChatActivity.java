@@ -20,8 +20,8 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.danielcswain.nearbychat.Messages.MessageAdapter;
@@ -39,6 +39,9 @@ import com.google.android.gms.nearby.messages.MessageListener;
 import com.tomergoldst.tooltips.ToolTipsManager;
 
 import java.util.ArrayList;
+
+import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
+import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
 
 /**
  * Activity using the GoogleApiClient and the Nearby Api to send custom messages to nearby devices.
@@ -61,7 +64,9 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private ArrayList<MessageObject> mMessageObjects;
     private static ArrayList<UserObject> mUserObjects;
-    private EditText mTextField;
+    private ImageView mEmojiButton;
+    private EmojIconActions mEmojiActions;
+    private EmojiconEditText mTextField;
     private ImageButton mSubmitButton;
     private RecyclerView.Adapter mMessageRecyclerAdapter;
     private static RecyclerView.Adapter mUserRecyclerAdapter;
@@ -236,13 +241,20 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
      */
     private void setUpMessageSendViews() {
         // Get the message send views
-        mTextField = (EditText) findViewById(R.id.text_entry_field);
+        mEmojiButton = (ImageView) findViewById(R.id.text_emoji_button);
+        mTextField = (EmojiconEditText) findViewById(R.id.text_entry_field);
         mSubmitButton = (ImageButton) findViewById(R.id.message_send_button);
 
         // Configure the rotation animation to signify a message is being sent
         mRotateAnimation.setInterpolator(new LinearInterpolator());
         mRotateAnimation.setDuration(500);
         mRotateAnimation.setRepeatCount(Animation.INFINITE);
+
+        // Use SuperNova-Emoji to show a Whatsapp style Emoji replacement keyboard when the mEmojiButton
+        // is clicked. Using the system default emoji rather than any styled (i.e. Apple Style or FB)
+        mEmojiActions = new EmojIconActions(this, mRootContainer, mTextField, mEmojiButton);
+        mEmojiActions.setUseSystemEmoji(true);
+        mEmojiActions.ShowEmojIcon();
 
         // Send a new message to the chat when the submit button is clicked
         mSubmitButton.setOnClickListener(new View.OnClickListener() {

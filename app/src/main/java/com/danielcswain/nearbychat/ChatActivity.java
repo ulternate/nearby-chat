@@ -65,7 +65,6 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private ArrayList<MessageObject> mMessageObjects;
     private static ArrayList<UserObject> mUserObjects;
-    private ImageView mEmojiButton;
     private EmojIconActions mEmojiActions;
     private EmojiconEditText mTextField;
     private ImageButton mSubmitButton;
@@ -242,7 +241,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
      */
     private void setUpMessageSendViews() {
         // Get the message send views
-        mEmojiButton = (ImageView) findViewById(R.id.text_emoji_button);
+        ImageView mEmojiButton = (ImageView) findViewById(R.id.text_emoji_button);
         mTextField = (EmojiconEditText) findViewById(R.id.text_entry_field);
         mSubmitButton = (ImageButton) findViewById(R.id.message_send_button);
 
@@ -486,7 +485,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         mUserRecyclerAdapter.notifyItemInserted(mUserObjects.size() - 1);
 
         // Set the users_list background colour to the messageUsersList colour now that items are in the view
-        RecyclerView usersList = (RecyclerView) findViewById(R.id.users_list);
+        RecyclerView usersList = (RecyclerView) mRootContainer.findViewById(R.id.users_list);
         usersList.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.messageUsersField));
     }
 

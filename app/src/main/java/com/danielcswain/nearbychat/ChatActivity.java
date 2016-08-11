@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
@@ -254,7 +255,17 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         // is clicked. Using the system default emoji rather than any styled (i.e. Apple Style or FB)
         mEmojiActions = new EmojIconActions(this, mRootContainer, mTextField, mEmojiButton);
         mEmojiActions.setUseSystemEmoji(true);
-        mEmojiActions.ShowEmojIcon();
+        mTextField.setUseSystemDefault(true);
+        // Use the onTouchListener on the mEmojiButton to only show the emoji keyboard when the image is touched.
+        // ImageView won't have focus over the EditText so the onTouch is the only way to trigger it without first getting focus
+        mEmojiButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                // Open and show the SuperNova-Emoji keyboard.
+                mEmojiActions.ShowEmojIcon();
+                return false;
+            }
+        });
 
         // Send a new message to the chat when the submit button is clicked
         mSubmitButton.setOnClickListener(new View.OnClickListener() {

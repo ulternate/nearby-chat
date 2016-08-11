@@ -250,7 +250,8 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onClick(View view) {
                 // Get the edit text field's text
                 String messageBody = mTextField.getText().toString();
-                if (!messageBody.isEmpty()){
+
+                if (!messageBody.isEmpty() && !messageBody.matches("^(\\s+)$")){
                     // Change the mSubmitbutton drawable to the loop/sync icon and animate it.
                     mSubmitButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_loop_light));
                     mSubmitButton.startAnimation(mRotateAnimation);
@@ -263,6 +264,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
                     mTextField.setText("");
                     mTextField.clearFocus();
                 } else {
+                    // The messageBody is empty or contains only whitespace characters
                     showSnackbar(getString(R.string.error_empty_message));
                 }
             }

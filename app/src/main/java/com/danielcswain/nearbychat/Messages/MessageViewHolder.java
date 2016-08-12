@@ -17,6 +17,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
     public TextView usernameTV;
     public TextView messageBodyTV;
     public ImageView userAvatarIV;
+    public ImageView messageBodyIV;
 
     /**
      * The ViewHolder constructor that holds the views for the RecyclerView Adapter
@@ -28,5 +29,6 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         this.usernameTV = (TextView) itemView.findViewById(R.id.username);
         this.messageBodyTV = (TextView) itemView.findViewById(R.id.message_body);
         this.userAvatarIV = (ImageView) itemView.findViewById(R.id.user_avatar);
+        this.messageBodyIV = (ImageView) itemView.findViewById(R.id.message_body_image);
     }
 }

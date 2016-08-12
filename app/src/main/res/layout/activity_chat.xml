@@ -45,9 +45,21 @@
             android:id="@+id/text_emoji_button"
             android:layout_width="@dimen/button_circular_40dp"
             android:layout_height="@dimen/button_circular_40dp"
+            android:padding="@dimen/activity_vertical_margin_4dp"
             android:src="@drawable/ic_insert_emoticon_grey"
             android:layout_gravity="center_vertical"
             android:contentDescription="@string/message_emoji_button_description"
+            />
+
+        <!--Button to launch an image picker and send an image-->
+        <ImageView
+            android:id="@+id/text_entry_image_button"
+            android:layout_width="@dimen/button_circular_40dp"
+            android:layout_height="@dimen/button_circular_40dp"
+            android:padding="@dimen/activity_vertical_margin_4dp"
+            android:src="@drawable/ic_insert_photo_grey"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/message_image_button_description"
             />
 
         <!--Message Text Entry field (supports Emoji via SuperNova-Emoji library-->

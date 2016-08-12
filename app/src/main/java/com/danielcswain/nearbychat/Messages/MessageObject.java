@@ -15,6 +15,8 @@ import java.util.UUID;
 public class MessageObject {
 
     public static final String MESSAGE_TYPE = "Message";
+    public static final String MESSAGE_CONTENT_TEXT = "text";
+    public static final String MESSAGE_CONTENT_IMAGE = "image";
 
     private static final Gson sGson = new Gson();
     private String mUsername;
@@ -22,17 +24,20 @@ public class MessageObject {
     private String mAvatarColour;
     private boolean mFromUser;
     private UUID mMessageUuid;
+    private String mMessageContent;
 
     /**
      * Constructor for initialising a single MessageObject.
      * @param username the username of the user sending the message
      * @param messageBody the message text
+     * @param messageContent the type of content being sent in the message body (image or text)
      * @param avatarColour the colour of the user's avatar
      * @param fromUser boolean used to determine which layout to use, either the message_item_received or sent.
      */
-    public MessageObject(String username, String messageBody, String avatarColour, boolean fromUser){
+    public MessageObject(String username, String messageBody, String messageContent, String avatarColour, boolean fromUser){
         this.mUsername = username;
         this.mMessageBody = messageBody;
+        this.mMessageContent = messageContent;
         this.mAvatarColour = avatarColour;
         this.mFromUser = fromUser;
         this.mMessageUuid = UUID.randomUUID();
@@ -69,6 +74,7 @@ public class MessageObject {
         if (obj != null && obj instanceof MessageObject){
             if (Objects.equals(((MessageObject) obj).mUsername, this.mUsername) &&
                     Objects.equals(((MessageObject) obj).mMessageBody, this.mMessageBody) &&
+                    Objects.equals(((MessageObject) obj).mMessageContent, this.mMessageContent) &&
                     Objects.equals(((MessageObject) obj).mAvatarColour, this.mAvatarColour) &&
                     Objects.equals(((MessageObject) obj).mFromUser, this.mFromUser) &&
                     Objects.equals(((MessageObject) obj).mMessageUuid, this.mMessageUuid)){
@@ -99,6 +105,10 @@ public class MessageObject {
 
     public UUID getMessageUuid() {
         return mMessageUuid;
+    }
+
+    public String getMessageContent(){
+        return mMessageContent;
     }
 
     public void setFromUser(boolean mFromUser) {

@@ -279,7 +279,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
                     mSubmitButton.startAnimation(mRotateAnimation);
 
                     // Publish the message (it will be added to the chat when published successfully and the animation will be stopped)
-                    publishMessage(new MessageObject(mUsername, messageBody, mAvatarColour, true));
+                    publishMessage(new MessageObject(mUsername, messageBody, MessageObject.MESSAGE_CONTENT_TEXT, mAvatarColour, true));
 
                     // Hide the keyboard and reset the message text field
                     hideSoftKeyboard(ChatActivity.this, view);

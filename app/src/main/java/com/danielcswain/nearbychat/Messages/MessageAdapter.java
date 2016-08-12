@@ -1,8 +1,11 @@
 package com.danielcswain.nearbychat.Messages;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,7 +88,22 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageViewHolder> {
 
         // Set the TextViews from the ViewHolder with the appropriate data from the messageObject.
         holder.usernameTV.setText(messageObject.getUsername());
-        holder.messageBodyTV.setText(messageObject.getMessageBody());
+
+        // Handle the messageBody based upon the message Type
+        if (Objects.equals(messageObject.getMessageContent(), MessageObject.MESSAGE_CONTENT_TEXT)) {
+            // Show the messageBody as text and hide the imageView
+            holder.messageBodyTV.setVisibility(View.VISIBLE);
+            holder.messageBodyTV.setText(messageObject.getMessageBody());
+            holder.messageBodyIV.setVisibility(View.GONE);
+        } else if (Objects.equals(messageObject.getMessageContent(), MessageObject.MESSAGE_CONTENT_IMAGE)){
+            // Show the messageBody as an image and hide the textView
+            holder.messageBodyTV.setVisibility(View.GONE);
+            holder.messageBodyIV.setVisibility(View.VISIBLE);
+            // Get the byte[] from the messageBody to retrieve the image
+            byte[] imageString = Base64.decode(messageObject.getMessageBody(), Base64.NO_WRAP);
+            Bitmap bm = BitmapFactory.decodeByteArray(imageString, 0, imageString.length);
+            holder.messageBodyIV.setImageBitmap(bm);
+        }
 
         // Set the user avatar colour to match the user's chosen colour.
         try{

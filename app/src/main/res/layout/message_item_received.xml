@@ -29,7 +29,7 @@
         android:textSize="@dimen/text_title"
         />
 
-    <!--The message content-->
+    <!--The message content for text images-->
     <TextView
         android:id="@+id/message_body"
         android:layout_width="wrap_content"
@@ -44,15 +44,18 @@
         android:background="@drawable/bg_message_item_received"
         />
 
+    <!--The message content for image messages-->
     <ImageView
         android:id="@+id/message_body_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/user_avatar"
-        android:padding="@dimen/activity_horizontal_margin_8dp"
+        android:padding="@dimen/message_bubble_padding"
         android:layout_marginRight="@dimen/message_body_alignment_margin"
+        android:layout_marginBottom="@dimen/message_bubble_margin"
         android:contentDescription="@string/message_body_image_description"
-        android:visibility="invisible"
+        android:background="@drawable/bg_message_item_sent"
+        android:adjustViewBounds="true"
         />
 
 </RelativeLayout>

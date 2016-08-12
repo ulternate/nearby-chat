@@ -26,9 +26,10 @@ android {
     }
 }
 
-// Repository for Supernova-Emoji library
+// Repository for Supernova-Emoji library and ImagePicker
 repositories {
     maven { url "https://dl.bintray.com/hani-momanii/maven"}
+    maven { url "https://jitpack.io" }
 }
 
 //Get the Nearby API Key (Debug key) from the gradle.properties file (not checked in)
@@ -54,5 +55,6 @@ dependencies {
     compile 'com.thebluealliance:spectrum:0.5.0'
     compile 'com.tomergoldst.android:tooltips:1.0.2'
     compile 'hani.momanii.supernova_emoji_library:supernova-emoji-library:0.0.2'
-    compile 'com.google.android.gms:play-services-nearby:9.4.0'
+    compile 'com.github.nguyenhoanglam:ImagePicker:1.0.2'
+    compile 'com.google.android.gms:play-services-nearby:9.2.1'
 }

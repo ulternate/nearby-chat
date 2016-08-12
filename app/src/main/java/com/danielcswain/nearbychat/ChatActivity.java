@@ -28,6 +28,7 @@ import android.widget.RelativeLayout;
 import com.danielcswain.nearbychat.Messages.MessageAdapter;
 import com.danielcswain.nearbychat.Messages.MessageDialog;
 import com.danielcswain.nearbychat.Messages.MessageObject;
+import com.danielcswain.nearbychat.Tasks.ImageCompressAsyncTask;
 import com.danielcswain.nearbychat.Users.UserAdapter;
 import com.danielcswain.nearbychat.Users.UserObject;
 import com.google.android.gms.common.ConnectionResult;
@@ -37,6 +38,8 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.messages.Message;
 import com.google.android.gms.nearby.messages.MessageListener;
+import com.nguyenhoanglam.imagepicker.activity.ImagePickerActivity;
+import com.nguyenhoanglam.imagepicker.model.Image;
 import com.tomergoldst.tooltips.ToolTipsManager;
 
 import java.util.ArrayList;
@@ -50,6 +53,7 @@ import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
 public class ChatActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int REQUEST_RESOLVE_ERROR = 1002;
+    private static final int REQUEST_IMAGE_PICKER = 1003;
     private static final String TAG = ChatActivity.class.getSimpleName();
     public static final String DIALOG_COUNTER_KEY = "dialog_counter";
     public static final String DIALOG_DISMISSED_KEY = "dialog_dismissed";
@@ -63,12 +67,13 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     private String mAvatarColour;
     private static UserObject sCurrentUser;
 
-    private ArrayList<MessageObject> mMessageObjects;
+    private static ArrayList<MessageObject> mMessageObjects;
     private static ArrayList<UserObject> mUserObjects;
+    private static ArrayList<Image> mSelectedImages;
     private EmojIconActions mEmojiActions;
     private EmojiconEditText mTextField;
-    private ImageButton mSubmitButton;
-    private RecyclerView.Adapter mMessageRecyclerAdapter;
+    private static ImageButton mSubmitButton;
+    private static RecyclerView.Adapter mMessageRecyclerAdapter;
     private static RecyclerView.Adapter mUserRecyclerAdapter;
 
     public static RelativeLayout mRootContainer;
@@ -76,7 +81,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     public static ToolTipsManager toolTipsManager;
 
     // Animation used to rotate the send button about it's center.
-    private Animation mRotateAnimation = new RotateAnimation(0.0f, 360.0f,
+    private static Animation mRotateAnimation = new RotateAnimation(0.0f, 360.0f,
             Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
             0.5f);
 
@@ -92,6 +97,11 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         mUsername = intent.getStringExtra(MainActivity.USERNAME_KEY);
         mAvatarColour = intent.getStringExtra(MainActivity.AVATAR_COLOUR_KEY);
         sCurrentUser = new UserObject(mUsername, mAvatarColour);
+
+        // Set up the ArrayLists
+        mMessageObjects = new ArrayList<>();
+        mUserObjects = new ArrayList<>();
+        mSelectedImages = new ArrayList<>();
 
         // Get the View for the snackbar
         mRootContainer = (RelativeLayout) findViewById(R.id.root_view);
@@ -130,31 +140,45 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onStop() {
         // Unpublish, unsubscribe and disconnect from the GoogleApiClient if connected.
-        if (mPubMessage != null) {
-            unpublish();
-        }
-        unsubscribe();
         if (mGoogleApiClient.isConnected()) {
+            if (mPubMessage != null) {
+                unpublish();
+            }
+            unsubscribe();
             mGoogleApiClient.disconnect();
         }
         // Remove the user's from the userRecyclerViewAdapter
         mUserRecyclerAdapter.notifyItemRangeRemoved(0, mUserObjects.size());
         mUserObjects.clear();
+        // Remove any images that may have been selected from the ArrayList
+        mSelectedImages.clear();
         super.onStop();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // If the GoogleApiClient couldn't connect it will prompt the user for permission to use Nearby
-        // using the following request code. Handle this request and connect to the GoogleApiClient if successful
-        if (requestCode == REQUEST_RESOLVE_ERROR) {
-            if (resultCode == RESULT_OK) {
-                mGoogleApiClient.connect();
-            } else {
-                Log.e(TAG, "GoogleApiClient connection failed. Unable to resolve.");
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode){
+            case REQUEST_RESOLVE_ERROR:
+                // If the GoogleApiClient couldn't connect it will prompt the user for permission to use Nearby
+                // using the following request code. Handle this request and connect to the GoogleApiClient if successful
+                if (resultCode == RESULT_OK) {
+                    mGoogleApiClient.connect();
+                } else {
+                    Log.e(TAG, "GoogleApiClient connection failed. Unable to resolve.");
+                }
+                break;
+            case REQUEST_IMAGE_PICKER:
+                // The image picker request was used, handle the result and get the images that were selected.
+                if (resultCode == RESULT_OK && data !=null){
+                    // Get the ArrayList<Image> of selected images and add it to the selectedImages ArrayList
+                    ArrayList<Image> selectedImages = data.getParcelableArrayListExtra(ImagePickerActivity.INTENT_EXTRA_SELECTED_IMAGES);
+                    mSelectedImages.addAll(selectedImages);
+                }
+
+                break;
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
+                break;
         }
     }
 
@@ -198,6 +222,24 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         if (!sCurrentUser.getUsername().isEmpty() && !sCurrentUser.getUsername().isEmpty()){
             publishHelloMessage(sCurrentUser);
         }
+        // Send any selected images and then reset the selection list.
+        if (mSelectedImages != null) {
+            if (!mSelectedImages.isEmpty()) {
+                // Try and send the images
+                for (Image image : mSelectedImages) {
+                    // Change the mSubmitButton drawable to the loop/sync icon and animate it.
+                    mSubmitButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_loop_light));
+                    mSubmitButton.startAnimation(mRotateAnimation);
+
+                    // Compress and publish as an async task
+                    ImageCompressAsyncTask imageCompressAsyncTask = new ImageCompressAsyncTask();
+                    String[] params = { image.getPath(), mUsername, mAvatarColour, ImageCompressAsyncTask.TRUE };
+                    imageCompressAsyncTask.execute(params);
+                }
+                // Clear the mSelectedImages arrayList
+                mSelectedImages.clear();
+            }
+        }
     }
 
     /**
@@ -212,7 +254,6 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         mUsersRecyclerView.setLayoutManager(mUsersLayoutManager);
 
         // Set up the RecyclerView Adapter
-        mUserObjects = new ArrayList<>();
         mUserRecyclerAdapter = new UserAdapter(mUserObjects);
         mUsersRecyclerView.setAdapter(mUserRecyclerAdapter);
     }
@@ -231,7 +272,6 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         mMessagesRecyclerView.setLayoutManager(mMessagesLayoutManager);
 
         // Set up the RecyclerView Adapter
-        mMessageObjects = new ArrayList<>();
         mMessageRecyclerAdapter = new MessageAdapter(mMessageObjects);
         mMessagesRecyclerView.setAdapter(mMessageRecyclerAdapter);
     }
@@ -242,6 +282,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     private void setUpMessageSendViews() {
         // Get the message send views
         ImageView mEmojiButton = (ImageView) findViewById(R.id.text_emoji_button);
+        ImageView mImagePickerButton = (ImageView) findViewById(R.id.text_entry_image_button);
         mTextField = (EmojiconEditText) findViewById(R.id.text_entry_field);
         mSubmitButton = (ImageButton) findViewById(R.id.message_send_button);
 
@@ -265,6 +306,20 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
                 return false;
             }
         });
+
+        // Use ImagePicker to show an image picker to send an image to the chat
+        mImagePickerButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                // Request the permissions required and open the imagePicker
+                Intent intent = new Intent(ChatActivity.this, ImagePickerActivity.class);
+                intent.putExtra(ImagePickerActivity.INTENT_EXTRA_MODE, ImagePickerActivity.MODE_SINGLE);
+                intent.putExtra(ImagePickerActivity.INTENT_EXTRA_SHOW_CAMERA, false);
+                startActivityForResult(intent, REQUEST_IMAGE_PICKER);
+                return false;
+            }
+        });
+
 
         // Send a new message to the chat when the submit button is clicked
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
@@ -376,7 +431,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
      * Publish the MessageObject to nearby devices.
      * @param messageObject the messageObject to be published
      */
-    private void publishMessage(final MessageObject messageObject) {
+    public static void publishMessage(final MessageObject messageObject) {
         mPubMessage = MessageObject.newNearbyMessage(messageObject);
         // Publish the message and display in the chat on the device if the publish action was successful
         Nearby.Messages.publish(mGoogleApiClient, mPubMessage)
@@ -388,13 +443,12 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
                             displayMessageInChat(mPubMessage, true);
                         } else {
                             // Show a snackbar with a publish failed message
-                            showSnackbar(getString(R.string.nearby_publish_message_failed));
+                            showSnackbar(MainActivity.mainContext.getString(R.string.nearby_publish_message_failed));
                         }
                         // Stop the animation regardless of successful publishing or not
-                        mRotateAnimation.cancel();
-                        mRotateAnimation.reset();
+                        resetMessageSendAnimation();
                         // Reset the message button's drawable to the send resource
-                        mSubmitButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.ic_send_light));
+                        mSubmitButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.mainContext,R.drawable.ic_send_light));
                     }
                 });
     }
@@ -440,7 +494,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
      * Display the received message in the chat feed
      * @param message the message received
      */
-    private void displayMessageInChat(Message message, boolean fromUser){
+    private static void displayMessageInChat(Message message, boolean fromUser){
         // Get the messageObject from the received Nearby Message
         MessageObject receivedMessage = MessageObject.fromNearbyMessage(message);
         // Set the fromUser to the passed boolean
@@ -500,9 +554,17 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     /**
      * Show a snackbar with a given message
      */
-    private void showSnackbar(String message){
+    public static void showSnackbar(String message){
         if (mRootContainer != null){
             Snackbar.make(mRootContainer, message, Snackbar.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * Reset the MessageSend animation
+     */
+    private static void resetMessageSendAnimation(){
+        mRotateAnimation.cancel();
+        mRotateAnimation.reset();
     }
 }

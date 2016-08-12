@@ -11,7 +11,7 @@
     <string name="welcome_message">Chat with people nearby you.</string>
     <string name="error_empty_username">Please enter or generate a username before joining the chat</string>
     <string name="error_empty_message">Please enter a message and try again</string>
-    <string name="message_text_entry_field_hint">Send a message to the chat</string>
+    <string name="message_text_entry_field_hint">Type a message</string>
     <string name="message_send_button_description">Send Message</string>
     <string name="message_avatar_sent_description">Your Avatar</string>
     <string name="message_avatar_received_description">Sender\'s Avatar</string>
@@ -24,6 +24,7 @@
     <string name="message_image_button_description">Add image</string>
     <string name="message_text_entry_field_hint_images_picked">Send %1$s</string>
     <string name="error_image_to_large">Chosen image too large to send as a nearby message. Messages must be less than 100kb</string>
+    <string name="message_image_send_in_progress">Sending message in the background. Larger images will take longer to be sent</string>
 
     <string-array name="animals">
         <item>Armadillo</item>

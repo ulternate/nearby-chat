@@ -70,8 +70,9 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
     private static ArrayList<MessageObject> mMessageObjects;
     private static ArrayList<UserObject> mUserObjects;
     private static ArrayList<Image> mSelectedImages;
+    private static boolean mImagesBeingSent;
     private EmojIconActions mEmojiActions;
-    private EmojiconEditText mTextField;
+    private static EmojiconEditText mTextField;
     private static ImageButton mSubmitButton;
     private static RecyclerView.Adapter mMessageRecyclerAdapter;
     private static RecyclerView.Adapter mUserRecyclerAdapter;
@@ -173,8 +174,12 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
                     // Get the ArrayList<Image> of selected images and add it to the selectedImages ArrayList
                     ArrayList<Image> selectedImages = data.getParcelableArrayListExtra(ImagePickerActivity.INTENT_EXTRA_SELECTED_IMAGES);
                     mSelectedImages.addAll(selectedImages);
+                    // Disable the editing of the edit text field until the image is sent (this is re-enabled in
+                    // the async task that publishes the image)
+                    toggleTextEntryField(false);
+                } else {
+                    Log.e(TAG, "Unable to get the selected Images from the Image Picker");
                 }
-
                 break;
             default:
                 super.onActivityResult(requestCode, resultCode, data);
@@ -227,6 +232,8 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
             if (!mSelectedImages.isEmpty()) {
                 // Try and send the images
                 for (Image image : mSelectedImages) {
+                    // indicate that there are images being sent
+                    mImagesBeingSent = true;
                     // Change the mSubmitButton drawable to the loop/sync icon and animate it.
                     mSubmitButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_loop_light));
                     mSubmitButton.startAnimation(mRotateAnimation);
@@ -418,7 +425,14 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
                     public void onResult(@NonNull Status status) {
                         if (status.isSuccess()) {
                             // Subscribed successfully, notify the user.
-                            showSnackbar(getApplicationContext().getString(R.string.nearby_subscription_success));
+                            if (mImagesBeingSent){
+                                // If there are image(s) being sent change the notification to indicate that
+                                showSnackbar(getApplicationContext().getString(R.string.message_image_send_in_progress));
+                                mImagesBeingSent = false;
+                            } else {
+                                // Otherwise, just show the stock connection successful message.
+                                showSnackbar(getApplicationContext().getString(R.string.nearby_subscription_success));
+                            }
                         } else {
                             // Unsuccessfully subscribed, notify the user.
                             showSnackbar(getApplicationContext().getString(R.string.nearby_subscription_failed));
@@ -433,6 +447,8 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
      */
     public static void publishMessage(final MessageObject messageObject) {
         mPubMessage = MessageObject.newNearbyMessage(messageObject);
+        //re-enable the edittext field in case it has been disabled (by the imagepicker)
+        toggleTextEntryField(true);
         // Publish the message and display in the chat on the device if the publish action was successful
         Nearby.Messages.publish(mGoogleApiClient, mPubMessage)
                 .setResultCallback(new ResultCallback<Status>() {
@@ -558,6 +574,14 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.C
         if (mRootContainer != null){
             Snackbar.make(mRootContainer, message, Snackbar.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * Toggle the editText field to be focusable (editable) or not.
+     */
+    public static void toggleTextEntryField(boolean enabled){
+        mTextField.setFocusable(enabled);
+        mTextField.setFocusableInTouchMode(enabled);
     }
 
     /**
